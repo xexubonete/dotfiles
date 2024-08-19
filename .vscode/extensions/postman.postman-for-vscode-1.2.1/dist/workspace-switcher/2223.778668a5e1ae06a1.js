@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkworkspace_switcher=self.webpackChunkworkspace_switcher||[]).push([[2223],{2223:(e,t,c)=>{c.r(t),c.d(t,{ReactQueryDevtools:()=>n,ReactQueryDevtoolsPanel:()=>r});const n=function(){return null},r=function(){return null}}}]);
+//# sourceMappingURL=2223.778668a5e1ae06a1.js.map

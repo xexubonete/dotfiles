@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcollection_workbench=self.webpackChunkcollection_workbench||[]).push([[2223],{92223:(e,n,c)=>{c.r(n),c.d(n,{ReactQueryDevtools:()=>l,ReactQueryDevtoolsPanel:()=>o});const l=function(){return null},o=function(){return null}}}]);
+//# sourceMappingURL=2223.0912a76e726ee430.js.map

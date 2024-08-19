@@ -1,0 +1,1110 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Razor.LanguageServer</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.AbstractHandlerProvider">
+            <summary>
+            Manages handler discovery and distribution.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractHandlerProvider.GetRegisteredMethods">
+            <summary>
+            Gets the <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.RequestHandlerMetadata"/>s for all registered methods.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractHandlerProvider.GetMethodHandler(System.String,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,System.String)">
+            <summary>
+            Gets the <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>s for a particular request.
+            </summary>
+            <param name="method">The method name for the request.</param>
+            <param name="requestTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the request type for this method.</param>
+            <param name="responseTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the response type for this method.</param>
+            <param name="language">The language for the request.</param>
+            <returns>The handler for the request.</returns>
+            <remarks>
+            If the handler for the given language is not found, the default handler is returned.
+            If the default handler is not found, an exception is thrown.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._queue">
+            <summary>
+            These are lazy to allow implementations to define custom variables that are used by
+            <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ConstructRequestExecutionQueue"/> or <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ConstructLspServices"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._lifeCycleLock">
+            <summary>
+            Ensures that we only run shutdown and exit code once in order.
+            Guards access to <see cref="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._shutdownRequestTask"/> and <see cref="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._exitNotificationTask"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._shutdownRequestTask">
+            <summary>
+            Task representing the work done on LSP server shutdown.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._exitNotificationTask">
+            <summary>
+            Task representing the work down on LSP exit.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1._serverExitedSource">
+            <summary>
+            Task completion source that is started when the server starts and completes when the server exits.
+            Used when callers need to wait for the server to cleanup.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.Initialize">
+            <summary>
+            Initializes the LanguageServer.
+            </summary>
+            <remarks>Should be called at the bottom of the implementing constructor or immediately after construction.</remarks>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ConstructLspServices">
+            <summary>
+            Extension point to allow creation of <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.ILspServices"/> since that can't always be handled in the constructor.
+            </summary>
+            <returns>An <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.ILspServices"/> instance for this server.</returns>
+            <remarks>This should only be called once, and then cached.</remarks>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ShutdownAsync(System.String)">
+            <summary>
+            Tells the LSP server to stop handling any more incoming messages (other than exit).
+            Typically called from an LSP shutdown request.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ExitAsync">
+            <summary>
+            Tells the LSP server to exit.  Requires that <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.ShutdownAsync(System.String)"/> was called first.
+            Typically called from an LSP exit notification.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1.JsonRpc_Disconnected(System.Object,StreamJsonRpc.JsonRpcDisconnectedEventArgs)">
+            <summary>
+            Cleanup the server if we encounter a json rpc disconnect so that we can be restarted later.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.AbstractRequestContextFactory`1">
+            <summary>
+            <para>
+            A factory for creating <typeparamref name="TRequestContext"/> objects from <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1"/>'s.
+            </para>
+            <para>
+            RequestContext's are useful for passing document context, since by default <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractRequestContextFactory`1.CreateRequestContextAsync``1(Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem{`0},Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,``0,System.Threading.CancellationToken)"/>
+            is run on the queue thread (and thus no mutating requests may be executing simultaneously, preventing possible race conditions).
+            It also allows somewhere to pass things like the <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.ILspServices" /> or <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.ILspLogger" /> which are useful on a wide variety of requests.
+            </para>
+            </summary>
+            <typeparam name="TRequestContext">The type of the RequestContext to be used by the handler.</typeparam>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractRequestContextFactory`1.CreateRequestContextAsync``1(Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem{`0},Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,``0,System.Threading.CancellationToken)">
+            <summary>
+            Create a <typeparamref name="TRequestContext"/> object from the given <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1"/>.
+            Note - throwing in the implementation of this method will cause the server to shutdown.
+            </summary>
+            <param name="queueItem">The <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1"/> from which to create the request context.</param>
+            <param name="methodHandler">The <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> for which to create the request context</param>
+            <param name="requestParam">The request parameters.</param>
+            <param name="cancellationToken"></param>
+            <returns>The <typeparamref name="TRequestContext"/> for this request.</returns>
+            <remarks>This method is called on the queue thread to allow context to be retrieved serially, without the possibility of race conditions from Mutating requests.</remarks>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.HandlerProvider">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.HandlerProvider.#ctor(Microsoft.CommonLanguageServerProtocol.Framework.ILspServices,Microsoft.CommonLanguageServerProtocol.Framework.AbstractTypeRefResolver)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IInitializeManager`2.GetInitializeResult">
+            <summary>
+            Gets a response to be used for "initialize", completing the negotiations between client and server.
+            </summary>
+            <returns>An InitializeResult.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IInitializeManager`2.SetInitializeParams(`0)">
+            <summary>
+            Store the InitializeParams for later retrieval.
+            </summary>
+            <param name="request">The InitializeParams to be stored.</param>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IInitializeManager`2.GetInitializeParams">
+            <summary>
+            Gets the InitializeParams to, for example, examine the ClientCapabilities.
+            </summary>
+            <returns>The InitializeParams object sent with "initialize".</returns>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.ILifeCycleManager">
+            <summary>
+            An optional component to run additional logic when LSP shutdown and exit are called,
+            for example logging messages, cleaning up custom resources, etc.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.ILifeCycleManager.ExitAsync">
+            <summary>
+            Called when the server recieves the LSP exit notification.
+            </summary>
+            <remarks>
+            This is always called after the LSP shutdown request and <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.ILifeCycleManager.ShutdownAsync(System.String)"/> runs
+            but before LSP services and the JsonRpc connection is disposed of in LSP exit.
+            Implementations are not expected to be threadsafe.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.ILifeCycleManager.ShutdownAsync(System.String)">
+            <summary>
+            Called when the server receives the LSP shutdown request.
+            </summary>
+            <remarks>
+            This is called before the request execution is closed.
+            Implementations are not expected to be threadsafe.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler">
+            <summary>
+            Top level type for LSP request handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler.MutatesSolutionState">
+            <summary>
+            Whether or not the solution state on the server is modified as a part of handling this request.
+            This may affect queuing behavior (IE mutating requests are run in serial rather than parallel) depending on the <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IRequestExecutionQueue`1"/> implementation.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandlerProvider">
+            <summary>
+            Optional interface that can be implemented by <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.ILspServices"/> implementations
+            to provide faster access to <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>s.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.INotificationHandler`1">
+            <summary>
+            An interface for handlers of methods which do not return a response and receive no parameters.
+            </summary>
+            <typeparam name="TRequestContext">The type of the RequestContext to be used by this handler.</typeparam>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.INotificationHandler`2">
+            <summary>
+            An interface for handlers of methods which do not return a response 
+            </summary>
+            <typeparam name="TRequest">The type of the Request parameter to be received.</typeparam>
+            <typeparam name="TRequestContext">The type of the RequestContext to be used by this handler.</typeparam>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1">
+            <summary>
+            An item to be queued for execution.
+            </summary>
+            <typeparam name="TRequestContext">The type of the request context to be passed along to the handler.</typeparam>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.StartRequestAsync(`0,Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,System.Threading.CancellationToken)">
+            <summary>
+            Executes the work specified by this queue item.
+            </summary>
+            <param name="requestContext">the context created by <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.CreateRequestContextAsync(Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,System.Threading.CancellationToken)"/></param>
+            <param name="handler">The handler to use to execute the request.</param>
+            <param name="cancellationToken" />
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> which completes when the request has finished.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.CreateRequestContextAsync(Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,System.Threading.CancellationToken)">
+            <summary>
+            Creates the context that is sent to the handler for this queue item.
+            Note - this method is always called serially inside the queue before
+            running the actual request in <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.StartRequestAsync(`0,Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,System.Threading.CancellationToken)"/>
+            Throwing in this method will cause the server to shutdown.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.LspServices">
+            <summary>
+            Provides access to LSP services.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.MethodName">
+            <summary>
+            The method being executed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.Language">
+            <summary>
+            The language of the request. The default is <see cref="F:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerConstants.DefaultLanguageName"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.RequestType">
+            <summary>
+            The type of the request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem`1.ResponseType">
+            <summary>
+            The type of the response.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.IRequestExecutionQueue`1">
+            <summary>
+            Queues requests to be executed in the proper order.
+            </summary>
+            <typeparam name="TRequestContext">The type of the RequestContext to be used by the handler.</typeparam>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IRequestExecutionQueue`1.ExecuteAsync``2(``0,System.String,System.String,Microsoft.CommonLanguageServerProtocol.Framework.ILspServices,System.Threading.CancellationToken)">
+            <summary>
+            Queue a request.
+            </summary>
+            <returns>A task that completes when the handler execution is done.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IRequestExecutionQueue`1.Start">
+            <summary>
+            Start the queue accepting requests once any event handlers have been attached.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IRequestHandler`3.HandleRequestAsync(`0,`2,System.Threading.CancellationToken)">
+            <summary>
+            Handles an LSP request in the context of the supplied document and/or solution.
+            </summary>
+            <param name="request">The request parameters.</param>
+            <param name="context">The LSP request context, which should have been filled in with document information from <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.ITextDocumentIdentifierHandler`2.GetTextDocumentIdentifier(`0)"/> if applicable.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the request processing.</param>
+            <returns>The LSP response.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.IRequestHandler`2.HandleRequestAsync(`1,System.Threading.CancellationToken)">
+            <summary>
+            Handles an LSP request in the context of the supplied document and/or solution.
+            </summary>
+            <param name="context">The LSP request context, which should have been filled in with document information from <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.ITextDocumentIdentifierHandler`2.GetTextDocumentIdentifier(`0)"/> if applicable.</param>
+            <param name="cancellationToken">A cancellation token that can be used to cancel the request processing.</param>
+            <returns>The LSP response.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.ITextDocumentIdentifierHandler`2.GetTextDocumentIdentifier(`0)">
+            <summary>
+            Gets the identifier of the document from the request, if the request provides one.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerConstants.DefaultLanguageName">
+            <summary>
+            Default language name for use with <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerEndpointAttribute"/> and <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.AbstractHandlerProvider.GetMethodHandler(System.String,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,System.String)"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerEndpointAttribute">
+            <summary>
+            An attribute which identifies the method which an <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> implements.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerEndpointAttribute.Method">
+            <summary>
+            Contains the method that this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> implements.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerEndpointAttribute.Languages">
+            <summary>
+            Contains the language name(s) supported by this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerEndpointAttribute.#ctor(System.String,System.String,System.String[])">
+            <summary>
+            Specifies the method that this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> implements and the language(s) supported by it.
+            </summary>
+            <param name="method">The request handler method name.</param>
+            <param name="language">The language name supported by this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>. For example, <see cref="F:Microsoft.CommonLanguageServerProtocol.Framework.LanguageServerConstants.DefaultLanguageName"/>, 'C#', etc.</param>
+            <param name="additionalLanguages">Additional language names supported by this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>.</param>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails">
+            <summary>
+            Provides information about an <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>.
+            </summary>
+            <param name="MethodName">The name of the LSP method handled.</param>
+            <param name="Language">The language this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> targets.</param>
+            <param name="RequestTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the request type, if any.</param>
+            <param name="ResponseTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the response type, if any.</param>
+            <param name="RequestContextTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the context type.</param>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.#ctor(System.String,System.String,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef,Microsoft.CommonLanguageServerProtocol.Framework.TypeRef)">
+            <summary>
+            Provides information about an <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/>.
+            </summary>
+            <param name="MethodName">The name of the LSP method handled.</param>
+            <param name="Language">The language this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> targets.</param>
+            <param name="RequestTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the request type, if any.</param>
+            <param name="ResponseTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the response type, if any.</param>
+            <param name="RequestContextTypeRef">A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the context type.</param>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.MethodName">
+            <summary>The name of the LSP method handled.</summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.Language">
+            <summary>The language this <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler"/> targets.</summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.RequestTypeRef">
+            <summary>A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the request type, if any.</summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.ResponseTypeRef">
+            <summary>A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the response type, if any.</summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.RequestContextTypeRef">
+            <summary>A <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> representing the context type.</summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.MethodHandlerDetails.GetAllHandlerDetails(System.Type)">
+            <summary>
+            Retrieves the generic argument information from the request handler type without instantiating it.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.NewtonsoftLanguageServer`1">
+            <summary>
+            Basic implementation of <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1"/> using Newtonsoft for serialization.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.NewtonsoftLanguageServer`1.#ctor(StreamJsonRpc.JsonRpc,Newtonsoft.Json.JsonSerializer,Microsoft.CommonLanguageServerProtocol.Framework.ILspLogger,Microsoft.CommonLanguageServerProtocol.Framework.AbstractTypeRefResolver)">
+            <summary>
+            Basic implementation of <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.AbstractLanguageServer`1"/> using Newtonsoft for serialization.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.NewtonsoftLanguageServer`1.NewtonsoftDelegatingEntryPoint.ExecuteRequestAsync(Newtonsoft.Json.Linq.JToken,System.Threading.CancellationToken)">
+            <summary>
+            StreamJsonRpc entry point for all handler methods.
+            The optional parameters allow StreamJsonRpc to call into the same method for any kind of request / notification (with any number of params or response).
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.NoValue">
+            <summary>
+            A placeholder type to help handle parameterless messages and messages with no return value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.QueueItem`3._completionSource">
+            <summary>
+            A task completion source representing the result of this queue item's work.
+            This is the task that the client is waiting on.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.QueueItem`3.StartRequestAsync(`2,Microsoft.CommonLanguageServerProtocol.Framework.IMethodHandler,System.Threading.CancellationToken)">
+            <summary>
+            Processes the queued request. Exceptions will be sent to the task completion source
+            representing the task that the client is waiting for, then re-thrown so that
+            the queue can correctly handle them depending on the type of request.
+            </summary>
+            <param name="context">Context used for the request.</param>
+            <param name="handler">The handler to execute.</param>
+            <param name="cancellationToken"></param>
+            <returns>The result of the request.</returns>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1">
+            <summary>
+            Coordinates the execution of LSP messages to ensure correct results are sent back.
+            </summary>
+            <remarks>
+            <para>
+            When a request comes in for some data the handler must be able to access a solution state that is correct
+            at the time of the request, that takes into account any text change requests that have come in  previously
+            (via textDocument/didChange for example).
+            </para>
+            <para>
+            This class achieves this by distinguishing between mutating and non-mutating requests, and ensuring that
+            when a mutating request comes in, its processing blocks all subsequent requests. As each request comes in
+            it is added to a queue, and a queue item will not be retrieved while a mutating request is running. Before
+            any request is handled the solution state is created by merging workspace solution state, which could have
+            changes from non-LSP means (eg, adding a project reference), with the current "mutated" state.
+            When a non-mutating work item is retrieved from the queue, it is given the current solution state, but then
+            run in a fire-and-forget fashion.
+            </para>
+            <para>
+            Regardless of whether a request is mutating or not, or blocking or not, is an implementation detail of this class
+            and any consumers observing the results of the task returned from
+            <see cref="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.ExecuteAsync``2(``0,System.String,System.String,Microsoft.CommonLanguageServerProtocol.Framework.ILspServices,System.Threading.CancellationToken)"/>
+            will see the results of the handling of the request, whenever it occurred.
+            </para>
+            <para>
+            Exceptions in the handling of non-mutating requests are sent back to callers. Exceptions in the processing of
+            the queue will close the LSP connection so that the client can reconnect. Exceptions in the handling of mutating
+            requests will also close the LSP connection, as at that point the mutated solution is in an unknown state.
+            </para>
+            <para>
+            After shutdown is called, or an error causes the closing of the connection, the queue will not accept any
+            more messages, and a new queue will need to be created.
+            </para>
+            </remarks>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1._queue">
+            <summary>
+            The queue containing the ordered LSP requests along with the trace activityId (to associate logs with a request) and
+             a combined cancellation token representing the queue's cancellation token and the individual request cancellation token.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1._queueProcessingTask">
+            <summary>
+            For test purposes only.
+            A task that completes when the queue processing stops.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.CancelInProgressWorkUponMutatingRequest">
+            <summary>
+            Indicates this queue requires in-progress work to be cancelled before servicing
+            a mutating request.
+            </summary>
+            <remarks>
+            This was added for WebTools consumption as they aren't resilient to
+            incomplete requests continuing execution during didChange notifications. As their
+            parse trees are mutable, a didChange notification requires all previous requests
+            to be completed before processing. This is similar to the O#
+            WithContentModifiedSupport(false) behavior.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.ExecuteAsync``2(``0,System.String,System.String,Microsoft.CommonLanguageServerProtocol.Framework.ILspServices,System.Threading.CancellationToken)">
+            <summary>
+            Queues a request to be handled by the specified handler, with mutating requests blocking subsequent requests
+            from starting until the mutation is complete.
+            </summary>
+            <param name="request">The request to handle.</param>
+            <param name="methodName">The name of the LSP method.</param>
+            <param name="lspServices">The set of LSP services to use.</param>
+            <param name="requestCancellationToken">A cancellation token that will cancel the handing of this request.
+            The request could also be cancelled by the queue shutting down.</param>
+            <returns>A task that can be awaited to observe the results of the handing of this request.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.BeforeRequest``1(``0)">
+            <summary>
+            Allows XAML to inspect the request before its dispatched.
+            Should not generally be used, this will be replaced by the OOP XAML server.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.GetHandlerForRequest(Microsoft.CommonLanguageServerProtocol.Framework.IQueueItem{`0})">
+            <summary>
+            Choose the method handler for the given request. By default this calls the <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.AbstractHandlerProvider"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.WrapStartRequestTaskAsync(System.Threading.Tasks.Task,System.Boolean)">
+            <summary>
+            Provides an extensibility point to log or otherwise inspect errors thrown from non-mutating requests,
+            which would otherwise be lost to the fire-and-forget task in the queue.
+            </summary>
+            <param name="nonMutatingRequestTask">The task to be inspected.</param>
+            <param name="rethrowExceptions">If exceptions should be re-thrown.</param>
+            <returns>The task from <paramref name="nonMutatingRequestTask"/>, to allow chained calls if needed.</returns>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.DisposeAsync">
+            <summary>
+            Shuts down the queue, stops accepting new messages, and cancels any in-progress or queued tasks.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.RequestExecutionQueue`1.TestAccessor.AreAllItemsCancelledUnsafeAsync">
+            <summary>
+            Test only method to validate that remaining items in the queue are cancelled.
+            This directly mutates the queue in an unsafe way, so ensure that all relevant queue operations
+            are done before calling.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CommonLanguageServerProtocol.Framework.SystemTextJsonLanguageServer`1._jsonSerializerOptions">
+            <summary>
+            JsonSerializer options used by streamjsonrpc (and for serializing / deserializing the requests to streamjsonrpc).
+            These options are specifically from the <see cref="T:StreamJsonRpc.SystemTextJsonFormatter"/> that added the exotic type converters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.SystemTextJsonLanguageServer`1.SystemTextJsonDelegatingEntryPoint.ExecuteRequest0Async(System.Threading.CancellationToken)">
+            <summary>
+            StreamJsonRpc entry point for handlers with no parameters.
+            Unlike Newtonsoft, we have to differentiate instead of using default parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.SystemTextJsonLanguageServer`1.SystemTextJsonDelegatingEntryPoint.ExecuteRequestAsync(System.Nullable{System.Text.Json.JsonElement},System.Threading.CancellationToken)">
+            <summary>
+            StreamJsonRpc entry point for handlers with parameters (and any response) type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef">
+            <summary>
+            Helper that avoids loading a <see cref="T:System.Type"/> by its full assembly-qualified name until needed.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.TypeName">
+            <summary>
+            Returns the full name of this type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.AssemblyName">
+            <summary>
+            Returns the full name of the assembly containing this type.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.CodeBase">
+            <summary>
+            Returns the code base of the assembly containing this type, if any.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.AssemblyQualifiedName">
+            <summary>
+            Returns the assembly-qualified name of this type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.From(System.String,System.String,System.String)">
+            <summary>
+            Constructs a <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> instance.
+            </summary>
+            <param name="typeName">The full name of this type.</param>
+            <param name="assemblyName">The full name of the assembly containing this type.</param>
+            <param name="codeBase">The code base of the assembly containing this type, if any.</param>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.From(System.Type)">
+            <summary>
+            Constructs a <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> from a <see cref="T:System.Type"/>.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> to use.</param>
+        </member>
+        <member name="M:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef.FromOrNull(System.Type)">
+            <summary>
+            Constructs a <see cref="T:Microsoft.CommonLanguageServerProtocol.Framework.TypeRef"/> from a <see cref="T:System.Type"/> or returns <see langword="null"/>
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> to use, or <see langword="null"/>.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.DocumentPositionInfoStrategy">
+            <summary>
+            The strategy to use to project the incoming caret position onto the generated C#/Html document
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.PreferCSharpOverHtmlIfPossible">
+            <summary>
+            When <see langword="true" />, we'll try to map the cursor position to C# even when it is in a Html context, for example
+            for component attributes that are fully within a Html context, but map to a C# property write in the generated document.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.CustomMessageTarget">
+            <summary>
+            The name of the endpoint to delegate to, from <see cref="T:Microsoft.CodeAnalysis.Razor.Protocol.CustomMessageNames"/>. This is the
+            custom endpoint that is sent via <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.IClientConnection"/> which returns
+            a response by delegating to C#/HTML.
+            </summary>
+            <remarks>
+            An example is <see cref="F:Microsoft.CodeAnalysis.Razor.Protocol.CustomMessageNames.RazorHoverEndpointName"/>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.CreateDelegatedParamsAsync(`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,Microsoft.CodeAnalysis.Razor.DocumentMapping.DocumentPositionInfo,System.Threading.CancellationToken)">
+            <summary>
+            The delegated object to send to the <see cref="P:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.CustomMessageTarget"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.HandleDelegatedResponseAsync(`1,`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,Microsoft.CodeAnalysis.Razor.DocumentMapping.DocumentPositionInfo,System.Threading.CancellationToken)">
+            <summary>
+            If the response needs to be handled, such as for remapping positions back, override and handle here
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.TryHandleAsync(`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,Microsoft.CodeAnalysis.Razor.DocumentMapping.DocumentPositionInfo,System.Threading.CancellationToken)">
+            <summary>
+            If the request can be handled without delegation, override this to provide a response. If a null
+            value is returned the request will be delegated to C#/HTML servers, otherwise the response
+            will be used in <see cref="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.HandleRequestAsync(`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,System.Threading.CancellationToken)"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.IsSupported">
+            <summary>
+            Returns true if the configuration supports this operation being handled, otherwise returns false. Use to
+            handle cases where <see cref="T:Microsoft.CodeAnalysis.Razor.Workspaces.LanguageServerFeatureOptions"/> other than <see cref="P:Microsoft.CodeAnalysis.Razor.Workspaces.LanguageServerFeatureOptions.SingleServerSupport"/>
+            need to be checked to validate that the operation can be done.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.HandleRequestAsync(`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,System.Threading.CancellationToken)">
+            <summary>
+            Implementation for <see cref="M:Microsoft.AspNetCore.Razor.LanguageServer.AbstractRazorDelegatingEndpoint`2.HandleRequestAsync(`0,Microsoft.AspNetCore.Razor.LanguageServer.EndpointContracts.RazorRequestContext,System.Threading.CancellationToken)"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.AutoInsert.OnAutoInsertEndpoint.DocumentPositionInfoStrategy">
+            <summary>
+            Used to to send request to Html even when it is in a Razor context, for example
+            for component attributes that are a Razor context, but we want to treat them as Html for auto-inserting quotes
+            after typing equals for attribute values.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.ClientConnection.OnInitializedAsync(Microsoft.CommonLanguageServerProtocol.Framework.ILspServices,System.Threading.CancellationToken)">
+            <summary>
+            Fires when the language server is set to "Started".
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.AddUsingsCodeActionProviderHelper.TryExtractNamespace(System.String,System.String@,System.String@)">
+            <summary>
+            Extracts the namespace from a C# add using statement provided by Visual Studio
+            </summary>
+            <param name="csharpAddUsing">Add using statement of the form `using System.X;`</param>
+            <param name="namespace">Extract namespace `System.X`</param>
+            <param name="prefix">The prefix to show, before the namespace, if any</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.UnformattedRemappingCSharpCodeActionResolver">
+            <summary>
+            Resolves and remaps the code action, without running formatting passes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.UnformattedRemappingCSharpCodeActionResolver.#ctor(Microsoft.CodeAnalysis.Razor.ProjectSystem.IDocumentContextFactory,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.IClientConnection,Microsoft.CodeAnalysis.Razor.DocumentMapping.IRazorDocumentMappingService)">
+            <summary>
+            Resolves and remaps the code action, without running formatting passes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.ICodeActionProvider.ProvideAsync(Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.RazorCodeActionContext,System.Collections.Immutable.ImmutableArray{Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.Models.RazorVSInternalCodeAction},System.Threading.CancellationToken)">
+            <summary>
+            Takes code actions provided by a child language, and provides code actions that should be returned to the LSP client.
+            </summary>
+            <remarks>
+            The list of code actions returned from all providers will be combined together in a list. A null result and an empty
+            result are effectively the same.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.Razor.CodeBlockService.CreateFormattedTextEdit(Microsoft.AspNetCore.Razor.Language.RazorCodeDocument,System.String,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions)">
+            <summary>
+             Creates a <see cref="T:Microsoft.VisualStudio.LanguageServer.Protocol.TextEdit"/> that will place the formatted generated method within a @code block in the file.
+            </summary>
+            <param name="code">
+             The <see cref="T:Microsoft.AspNetCore.Razor.Language.RazorCodeDocument"/> of the file where the generated method will be placed.
+            </param>
+            <param name="templateWithMethodSignature">
+             The skeleton of the generated method where a <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/> should be placed
+             anywhere that needs to have some indenting, <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/> anywhere that
+             needs some initial indenting.
+             It should look something like:
+              <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/><see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/>public void MethodName()
+              <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/><see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/>{
+              <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/><see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/><see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/>throw new NotImplementedException();
+              <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/><see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/>}
+            </param>
+            <param name="options">
+             The <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions"/> that contains information about indentation.
+            </param>
+            <returns>
+             A <see cref="T:Microsoft.VisualStudio.LanguageServer.Protocol.TextEdit"/> that will place the formatted generated method within a @code block in the file.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.Razor.CodeBlockService.IsLineEmpty(Microsoft.CodeAnalysis.Text.TextLine)">
+            <summary>
+             Determines whether the line is empty.
+            </summary>
+            <param name="textLine">The line to check.</param>
+            <returns>true if the line is empty, otherwise false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.CodeActions.ExtractToCodeBehindCodeActionResolver.GenerateCodeBehindPath(System.String)">
+            <summary>
+            Generate a file path with adjacent to our input path that has the
+            correct codebehind extension, using numbers to differentiate from
+            any collisions.
+            </summary>
+            <param name="path">The origin file path.</param>
+            <returns>A non-existent file path with the same base name and a codebehind extension.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.DelegatedCompletionResponseRewriter.Order">
+             <summary>
+             Defines the order in which the rewriter will run. Implementors of <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.DelegatedCompletionResponseRewriter"/> should utilize
+             the <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.DelegatedCompletionResponseRewriter.ExecutionBehaviorOrder"/> type to determine order.
+            
+             <see cref="P:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.DelegatedCompletionResponseRewriter.Order"/> is only called once to determine order (needs to represent a static order).
+             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.DesignTimeHelperResponseRewriter">
+            <summary>
+             Removes Razor design-time helpers from a C# completion list.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.Completion.Delegation.SnippetResponseRewriter">
+            <summary>
+            Modifies delegated snippet completion items
+            </summary>
+            <remarks>
+            At the moment primarily used to modify C# "using" snippet to "using statement" snippet
+            in order to disambiguate it from Razor "using directive" snippet
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.DefaultRazorComponentSearchEngine.TryLocateComponentAsync(Microsoft.AspNetCore.Razor.Language.TagHelperDescriptor)">
+            <summary>Search for a component in a project based on its tag name and fully qualified name.</summary>
+            <remarks>
+            This method makes several assumptions about the nature of components. First, it assumes that a component
+            a given name `Name` will be located in a file `Name.razor`. Second, it assumes that the namespace the
+            component is present in has the same name as the assembly its corresponding tag helper is loaded from.
+            Implicitly, this method inherits any assumptions made by TrySplitNamespaceAndType.
+            </remarks>
+            <param name="tagHelper">A TagHelperDescriptor to find the corresponding Razor component for.</param>
+            <returns>The corresponding DocumentSnapshot if found, null otherwise.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="tagHelper"/> is null.</exception>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.Diagnostics.RazorTranslateDiagnosticsService">
+            <summary>
+            Contains several methods for mapping and filtering Razor and C# diagnostics. It allows for
+            translating code diagnostics from one representation into another, such as from C# to Razor.
+            </summary>
+            <param name="documentMappingService">The <see cref="T:Microsoft.CodeAnalysis.Razor.DocumentMapping.IRazorDocumentMappingService"/>.</param>
+            <param name="loggerFactory">The <see cref="T:Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Diagnostics.RazorTranslateDiagnosticsService.#ctor(Microsoft.CodeAnalysis.Razor.DocumentMapping.IRazorDocumentMappingService,Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory)">
+            <summary>
+            Contains several methods for mapping and filtering Razor and C# diagnostics. It allows for
+            translating code diagnostics from one representation into another, such as from C# to Razor.
+            </summary>
+            <param name="documentMappingService">The <see cref="T:Microsoft.CodeAnalysis.Razor.DocumentMapping.IRazorDocumentMappingService"/>.</param>
+            <param name="loggerFactory">The <see cref="T:Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Diagnostics.RazorTranslateDiagnosticsService.TranslateAsync(Microsoft.CodeAnalysis.Razor.Protocol.RazorLanguageKind,Microsoft.VisualStudio.LanguageServer.Protocol.Diagnostic[],Microsoft.CodeAnalysis.Razor.ProjectSystem.DocumentContext,System.Threading.CancellationToken)">
+            <summary>
+            Translates code diagnostics from one representation into another.
+            </summary>
+            <param name="diagnosticKind">The `RazorLanguageKind` of the `Diagnostic` objects included in `diagnostics`.</param>
+            <param name="diagnostics">An array of `Diagnostic` objects to translate.</param>
+            <param name="documentContext">The `DocumentContext` for the code document associated with the diagnostics.</param>
+            <param name="cancellationToken">A `CancellationToken` to observe while waiting for the task to complete.</param>
+            <returns>An array of translated diagnostics</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.DirectoryHelper.GetFilteredFiles(System.String,System.String,System.Collections.Generic.IReadOnlyCollection{System.String},Microsoft.AspNetCore.Razor.LanguageServer.DirectoryHelper.IFileSystem,Microsoft.CodeAnalysis.Razor.Logging.ILogger)">
+            <summary>
+            Finds all the files in a directory which meet the given criteria.
+            </summary>
+            <param name="workspaceDirectory">The directory to be searched.</param>
+            <param name="searchPattern">The pattern to apply when searching.</param>
+            <param name="ignoredDirectories">List of directories to skip when recursing.</param>
+            <param name="fileSystem">Exists for tests only. DO NOT PROVIDE outside of tests.</param>
+            <param name="logger">An optional logger to report on exceptional situations such as <see cref="T:System.IO.PathTooLongException"/>.</param>
+            <returns>A list of files within the given directory that meet the search criteria.</returns>
+            <remarks>This method is needed to avoid problematic folders such as "node_modules" which are known not to yield the desired results or may cause performance issues.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.FindAllReferences.FindAllReferencesEndpoint.FilterReferenceDisplayText(System.Object)">
+            <summary>
+            If the reference text is showing a generated identifier (such as "__o =") this
+            fixes it to be what the actual reference display would look like to a user.
+            See https://github.com/dotnet/razor/issues/4611 for more details on what this fixes
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingContext.GetIndentations">
+            <summary>A Dictionary of int (line number) to IndentationContext.</summary>
+            <remarks>
+            Don't use this to discover the indentation level you should have, use
+            <see cref="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingContext.TryGetIndentationLevel(System.Int32,System.Int32@)"/> which operates on the position rather than just the line.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingContext.GetIndentationLevelString(System.Int32)">
+            <summary>
+            Generates a string of indentation based on a specific indentation level. For instance, inside of a C# method represents 1 indentation level. A method within a class would have indentaiton level of 2 by default etc.
+            </summary>
+            <param name="indentationLevel">The indentation level to represent</param>
+            <returns>A whitespace string representing the indentation level based on the configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingContext.GetIndentationOffsetForLevel(System.Int32)">
+            <summary>
+            Given a level, returns the corresponding offset.
+            </summary>
+            <param name="level">A value representing the indentation level.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingContext.DEBUG_ValidateComponents(Microsoft.AspNetCore.Razor.Language.RazorCodeDocument,Microsoft.AspNetCore.Razor.Language.RazorCodeDocument)">
+            <summary>
+            It can be difficult in the testing infrastructure to correct constructs input files that work consistently across
+            context changes, so this method validates that the number of components isn't changing due to lost tag help info.
+            Without this guarantee its hard to reason about test behaviour/failures.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.AddIndentationToMethod(System.String,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions,System.Int32)">
+            <summary>
+             Adds indenting to the method.
+            </summary>
+            <param name="method">
+             The method to add indenting to. The method should be marked with <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/> where an indent is wanted
+            </param>
+            <param name="options">
+             The <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions"/> that contains information about indenting.
+            </param>
+            <param name="startingIndent">
+             The size of the any existing indent.
+            </param>
+            <returns>The indented method.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.AddIndentationToMethod(System.String,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions,System.Int32,System.Int32,System.String)">
+            <summary>
+             Adds indenting to the method.
+            </summary>
+            <param name="method">
+             The method to add indenting to. The method should be marked with <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/> where an indent is wanted
+             and <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/> where some initial indent is needed.
+            </param>
+            <param name="options">
+             The <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions"/> that contains information about indenting.
+            </param>
+            <param name="startAbsoluteIndex">
+             The absolute index of the beginning of the class in the C# file the method will be added to.
+            </param>
+            <param name="numCharacterBefore">
+             The number of characters on the line before where startAbsoluteIndex is in the source.
+            </param>
+            <param name="source">
+             The contents of the C# file.
+            </param>
+            <returns>The indented method.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.AddIndentationToMethod(System.String,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions,System.Int32,System.Int32,Microsoft.AspNetCore.Razor.Language.RazorSourceDocument)">
+            <summary>
+             Adds indenting to the method.
+            </summary>
+            <param name="method">
+             The method to add indenting to. The method should be marked with <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.Indent"/> where an indent is wanted
+             and <see cref="F:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.InitialIndent"/> where some initial indent is needed.
+            </param>
+            <param name="options">
+             The <see cref="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions"/> that contains information about indenting.
+            </param>
+            <param name="startAbsoluteIndex">
+             The absolute index of the beginning of the code block in the Razor file where the method will be added to.
+            </param>
+            <param name="numCharacterBefore">
+             The number of characters on the line before where startAbsoluteIndex is in the source.
+            </param>
+            <param name="source">
+             The <see cref="T:Microsoft.AspNetCore.Razor.Language.RazorSourceDocument"/> of the razor file the method is being added to.
+            </param>
+            <returns>The indented method.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.FormattingUtilities.GetIndentationString(System.Int32,System.Boolean,System.Int32)">
+            <summary>
+            Given a <paramref name="indentation"/> amount of characters, generate a string representing the configured indentation.
+            </summary>
+            <param name="indentation">An amount of characters to represent the indentation.</param>
+            <param name="insertSpaces">Whether spaces are used for indentation.</param>
+            <param name="tabSize">The size of a tab.</param>
+            <returns>A whitespace string representation indentation.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.HtmlFormatter.FixHtmlTestEdits(Microsoft.CodeAnalysis.Text.SourceText,Microsoft.VisualStudio.LanguageServer.Protocol.TextEdit[])">
+            <summary>
+            Sometimes the Html language server will send back an edit that contains a tilde, because the generated
+            document we send them has lots of tildes. In those cases, we need to do some extra work to compute the
+            minimal text edits
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.IndentationContext.ExistingIndentation">
+            <summary>
+            The number of characters of indentation there are on this line
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Formatting.IndentationContext.ExistingIndentationSize">
+            <summary>
+            The amount of visual indentation there is on this line, taking into account tab size
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.ClaspLoggingBridge">
+            <summary>
+            Providers a bridge from CLaSP, which uses ILspLogger, to our logging infrastructure, which uses ILogger
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Hosting.RazorLSPOptions.From(Microsoft.CodeAnalysis.Razor.Settings.ClientSettings)">
+            <summary>
+            Initializes the LSP options with the settings from the passed in client settings, and default values for anything
+            not defined in client settings.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.IConfigurationSyncService">
+            <summary>
+            Service that syncs settings from the client to the LSP server
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.LspProjectEngineFactoryProvider">
+            <summary>
+            In the language server, we provide an <see cref="T:Microsoft.AspNetCore.Razor.ProjectEngineHost.IProjectEngineFactoryProvider"/> that wraps
+            <see cref="P:Microsoft.AspNetCore.Razor.ProjectEngineHost.ProjectEngineFactories.DefaultProvider"/> and configure every <see cref="T:Microsoft.AspNetCore.Razor.Language.RazorProjectEngine"/>
+            with the current code-gen options.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.LspProjectEngineFactoryProvider.#ctor(Microsoft.AspNetCore.Razor.LanguageServer.RazorLSPOptionsMonitor)">
+            <summary>
+            In the language server, we provide an <see cref="T:Microsoft.AspNetCore.Razor.ProjectEngineHost.IProjectEngineFactoryProvider"/> that wraps
+            <see cref="P:Microsoft.AspNetCore.Razor.ProjectEngineHost.ProjectEngineFactories.DefaultProvider"/> and configure every <see cref="T:Microsoft.AspNetCore.Razor.Language.RazorProjectEngine"/>
+            with the current code-gen options.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.MapCode.MapCodeEndpoint">
+            <summary>
+            Maps requested code to a given Razor document.
+            </summary>
+            <remarks>
+            This class and its mapping heuristics will likely be constantly evolving as we receive
+            more advanced inputs from the client.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.MapCode.MapCodeEndpoint.#ctor(Microsoft.CodeAnalysis.Razor.DocumentMapping.IRazorDocumentMappingService,Microsoft.CodeAnalysis.Razor.ProjectSystem.IDocumentContextFactory,Microsoft.AspNetCore.Razor.LanguageServer.Hosting.IClientConnection,Microsoft.AspNetCore.Razor.Telemetry.ITelemetryReporter)">
+            <summary>
+            Maps requested code to a given Razor document.
+            </summary>
+            <remarks>
+            This class and its mapping heuristics will likely be constantly evolving as we receive
+            more advanced inputs from the client.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.PreferAttributeNameDocumentPositionInfoStrategy">
+            <summary>
+            A projection strategy that, when given a position that occurs anywhere in an attribute name, will return the projection
+            for the position at the start of the attribute name, ignoring any prefix or suffix. eg given any location within the
+            attribute "@bind-Value:after", it will return the projection at the point of the word "Value" therein.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.ProjectSystem.IProjectSnapshotManagerExtensions.FindPotentialProjects(Microsoft.CodeAnalysis.Razor.ProjectSystem.IProjectSnapshotManager,System.String)">
+            <summary>
+            Finds all the projects where the document path starts with the path of the folder that contains the project file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.ProjectSystem.RazorProjectService">
+            <summary>
+            Maintains the language server's <see cref="T:Microsoft.CodeAnalysis.Razor.ProjectSystem.IProjectSnapshotManager"/> with the semantics of Razor's project model.
+            </summary>
+            <remarks>
+            This service implements <see cref="T:Microsoft.CodeAnalysis.Razor.Workspaces.IRazorStartupService"/> to ensure it is created early so it can begin
+            initializing immediately.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.RazorLanguageServer.LoggerFactoryWrapper">
+            <summary>
+            Very small wrapper around the <see cref="T:Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory"/> to add a prefix to the category name, so we can tell in the logs
+            whether things are coming from the VS side, the LSP side, of our code. This is only temporary and will be removed when we move
+            to cohosting as there will only be one side.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.RazorLanguageServer.LoggerFactoryWrapper.#ctor(Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory)">
+            <summary>
+            Very small wrapper around the <see cref="T:Microsoft.CodeAnalysis.Razor.Logging.ILoggerFactory"/> to add a prefix to the category name, so we can tell in the logs
+            whether things are coming from the VS side, the LSP side, of our code. This is only temporary and will be removed when we move
+            to cohosting as there will only be one side.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.RazorSyntaxFacts.TryGetAttributeNameAbsoluteIndex(Microsoft.AspNetCore.Razor.Language.RazorCodeDocument,System.Int32,System.Int32@)">
+            <summary>
+            Given an absolute index positioned in an attribute, finds the absolute index of the part of the
+            attribute that represents the attribute name. eg. for @bi$$nd-Value it will find the absolute index
+            of "Value"
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.RazorSyntaxFacts.TryGetFullAttributeNameSpan(Microsoft.AspNetCore.Razor.Language.RazorCodeDocument,System.Int32,Microsoft.CodeAnalysis.Text.TextSpan@)">
+            <summary>
+            Gets the span of the entire "name" part of an attribute, if the <paramref name="absoluteIndex"/> is anywhere within it,
+            including any prefix or suffix
+            For example given "&lt;Goo @bi$$nd-Value:after="val" /&gt;" with the cursor at $$, it would return the span from "@" to "r".
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.WorkspaceSemanticTokensRefreshTrigger">
+            <summary>
+            Sends a 'workspace\semanticTokens\refresh' request each time the project changes.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagParams">
+            <summary>
+            Class representing the parameters sent for a textDocument/_vsweb_wrapWithTag request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagParams.TextDocument">
+            <summary>
+            Gets or sets the identifier for the text document to be operate on.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagParams.Range">
+            <summary>
+            Gets or sets the selection range to be wrapped.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagParams.TagName">
+            <summary>
+            Gets or sets the wrapping tag name.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagParams.Options">
+            <summary>
+            Gets or sets the formatting options.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagResponse">
+            <summary>
+            Class representing the response of an WrapWithTag response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagResponse.TagRange">
+            <summary>
+            Gets or sets the range of the wrapping tag.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.WrapWithTag.WrapWithTagResponse.TextEdits">
+            <summary>
+            Gets or sets the text edits.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Blazor_directive_attributes">
+            <summary>Blazor directive attributes</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Changes">
+            <summary>Changes:</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Create_Component_FromTag_Title">
+            <summary>Create component from tag</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Diagnostics_after">
+            <summary>Diagnostics after:</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Diagnostics_before">
+            <summary>Diagnostics before:</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Document_Not_Found">
+            <summary>Document {0} was not found.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatDocument_Not_Found(System.Object)">
+            <summary>Document {0} was not found.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Edit_at_adds">
+            <summary>Edit at {0} adds the non-whitespace content '{1}'.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatEdit_at_adds(System.Object,System.Object)">
+            <summary>Edit at {0} adds the non-whitespace content '{1}'.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Edit_at_deletes">
+            <summary>Edit at {0} deletes the non-whitespace content '{1}'.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatEdit_at_deletes(System.Object,System.Object)">
+            <summary>Edit at {0} deletes the non-whitespace content '{1}'.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.ExtractTo_CodeBehind_Title">
+            <summary>Extract block to code behind</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.File_Externally_Modified">
+            <summary>File was externally modified: {0}</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatFile_Externally_Modified(System.Object)">
+            <summary>File was externally modified: {0}</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Format_operation_changed_diagnostics">
+            <summary>A format operation is being abandoned because it would introduce or remove one of more diagnostics.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Format_operation_changed_nonwhitespace">
+            <summary>A format operation is being abandoned because it would add or delete non-whitespace content.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Generate_Async_Event_Handler_Title">
+            <summary>Generate Async Event Handler '{0}'</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatGenerate_Async_Event_Handler_Title(System.Object)">
+            <summary>Generate Async Event Handler '{0}'</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Generate_Event_Handler_Title">
+            <summary>Generate Event Handler '{0}'</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatGenerate_Event_Handler_Title(System.Object)">
+            <summary>Generate Event Handler '{0}'</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Language_Services_Missing_Service">
+            <summary>Razor language services not configured properly, missing language service '{0}'.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatLanguage_Services_Missing_Service(System.Object)">
+            <summary>Razor language services not configured properly, missing language service '{0}'.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Not_Available_In">
+            <summary>Not available in</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.ReTrigger_Completions_Title">
+            <summary>"Re-trigger completions..."</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.TagHelper_Attribute_Glyph">
+            <summary>Razor TagHelper Attribute Glyph</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.TagHelper_Element_Glyph">
+            <summary>Razor TagHelper Element Glyph</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Unknown_ProjectChangeKind">
+            <summary>Unknown ProjectChangeKind {0}</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.FormatUnknown_ProjectChangeKind(System.Object)">
+            <summary>Unknown ProjectChangeKind {0}</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Version_Should_Not_Be_Null">
+            <summary>Provided version should not be null.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Razor.LanguageServer.Resources.SR.Statement">
+            <summary>statement</summary>
+        </member>
+    </members>
+</doc>

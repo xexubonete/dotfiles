@@ -1,0 +1,156 @@
+{
+	"name": "vscode-dotnet-runtime",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dotnet/vscode-dotnet-runtime.git"
+	},
+	"bugs": {
+		"url": "https://github.com/dotnet/vscode-dotnet-runtime/issues"
+	},
+	"license": "MIT",
+	"author": "Microsoft Corporation",
+	"displayName": ".NET Install Tool",
+	"description": "This extension installs and manages different versions of the .NET SDK and Runtime.",
+	"appInsightsKey": "02dc18e0-7494-43b2-b2a3-18ada5fcb522",
+	"icon": "images/dotnetIcon.png",
+	"version": "2.1.2",
+	"publisher": "ms-dotnettools",
+	"engines": {
+		"vscode": "^1.81.1"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		".NET",
+		".NET Core",
+		"dotnet",
+		"Extension Authoring",
+		"runtime"
+	],
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": true
+		},
+		"virtualWorkspaces": true
+	},
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./dist/extension.js",
+	"types": "./dist/extension.d.ts",
+	"contributes": {
+		"commands": [
+			{
+				"command": "dotnet.reportIssue",
+				"title": "Report an issue with the .NET Install Tool.",
+				"category": ".NET Install Tool"
+			},
+			{
+				"command": "dotnet.acquireGlobalSDKPublic",
+				"title": "Install the .NET SDK System-Wide.",
+				"category": ".NET Install Tool",
+				"enablement": "!dotnetAcquisitionExtension.isGlobalSDKUnsupported"
+			},
+			{
+				"command": "dotnet.uninstallPublic",
+				"title": "Uninstall .NET.",
+				"category": ".NET Install Tool"
+			}
+		],
+		"configuration": {
+			"title": ".NET Install Tool",
+			"properties": {
+				"dotnetAcquisitionExtension.enableTelemetry": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable Telemetry for the .NET Install Tool. Restart VS Code to apply changes."
+				},
+				"dotnetAcquisitionExtension.enablePreviewFeatures": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Preview Features for the Extension. Restart VS Code to apply changes."
+				},
+				"dotnetAcquisitionExtension.installTimeoutValue": {
+					"type": "number",
+					"default": 600,
+					"description": "Timeout for installing .NET in seconds."
+				},
+				"dotnetAcquisitionExtension.existingDotnetPath": {
+					"type": "array",
+					"description": "File Path to an existing installation of .NET to be used by one extension. Used for both the .NET SDK and .NET Runtime. Restart VS Code to apply changes.",
+					"examples": [
+						"C:\\Program Files\\dotnet\\dotnet.exe",
+						"/usr/local/share/dotnet/dotnet",
+						"/usr/lib/dotnet/dotnet"
+					]
+				},
+				"dotnetAcquisitionExtension.sharedExistingDotnetPath": {
+					"type": "string",
+					"description": "The path of the preexisting .NET SDK and .NET Runtime you'd like to use for ALL extensions. Restart VS Code to apply changes.",
+					"examples": [
+						"C:\\Program Files\\dotnet\\dotnet.exe",
+						"/usr/local/share/dotnet/dotnet",
+						"/usr/lib/dotnet/dotnet"
+					]
+				},
+				"dotnetAcquisitionExtension.proxyUrl": {
+					"type": "string",
+					"description": "URL to a proxy if you use one, such as: https://proxy:port"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile-all && npm install && webpack --mode production && dotnet build ../msbuild/signJs --property jsOutputPath=..\\..\\vscode-dotnet-runtime-extension\\dist -bl -v:normal",
+		"compile": "npm run clean && tsc -p ./",
+		"watch": "npm run compile && tsc -watch -p ./",
+		"test": "npm run compile --silent && node ./dist/test/functional/runTest.js",
+		"clean": "rimraf dist",
+		"compile-all": "cd ../vscode-dotnet-runtime-library && npm install && npm run compile && cd ../vscode-dotnet-runtime-extension && npm install && npm run compile",
+		"lint": "tslint -c ../tslint.json '../vscode-dotnet-runtime-library/src/**/*.ts' '../vscode-dotnet-runtime-extension/src/**/*.ts'",
+		"webpack": "webpack --mode development"
+	},
+	"dependencies": {
+		"@types/chai-as-promised": "^7.1.8",
+		"@vscode/test-electron": "^2.3.9",
+		"axios": "^1.7.4",
+		"axios-cache-interceptor": "^1.0.1",
+		"axios-retry": "^3.4.0",
+		"chai": "4.3.4",
+		"glob": "^7.2.0",
+		"https-proxy-agent": "^7.0.2",
+		"mocha": "^9.1.3",
+		"open": "^8.4.0",
+		"rimraf": "^3.0.2",
+		"shelljs": "^0.8.5",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.5.4",
+		"vscode-dotnet-runtime-library": "file:../vscode-dotnet-runtime-library",
+		"webpack-permissions-plugin": "^1.0.9"
+	},
+	"devDependencies": {
+		"@types/chai": "^4.3.5",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "^20.0.0",
+		"@types/rimraf": "3.0.2",
+		"@types/source-map-support": "^0.5.10",
+		"@types/vscode": "1.74.0",
+		"copy-webpack-plugin": "^9.0.1",
+		"webpack": "^5.88.2",
+		"webpack-cli": "^4.9.1"
+	},
+	"__metadata": {
+		"id": "1aab81a1-b3d9-4aef-976b-577d5d90fe3f",
+		"publisherDisplayName": "Microsoft",
+		"publisherId": "d05e23de-3974-4ff0-8d47-23ee77830092",
+		"isPreReleaseVersion": false,
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1724102635079,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}

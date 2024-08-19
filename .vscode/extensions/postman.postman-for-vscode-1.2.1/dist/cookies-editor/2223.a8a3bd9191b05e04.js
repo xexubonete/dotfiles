@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcookies_editor=self.webpackChunkcookies_editor||[]).push([[2223],{2223:(e,o,t)=>{t.r(o),t.d(o,{ReactQueryDevtools:()=>n,ReactQueryDevtoolsPanel:()=>u});const n=function(){return null},u=function(){return null}}}]);
+//# sourceMappingURL=2223.a8a3bd9191b05e04.js.map

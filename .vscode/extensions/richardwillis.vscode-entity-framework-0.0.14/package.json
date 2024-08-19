@@ -1,0 +1,485 @@
+{
+	"name": "vscode-entity-framework",
+	"displayName": "Entity Framework",
+	"description": "Manage Entity Framework migrations in VS Code",
+	"version": "0.0.14",
+	"engines": {
+		"vscode": "^1.64.0",
+		"node": "^16",
+		"npm": "^8"
+	},
+	"pricing": "Free",
+	"private": true,
+	"publisher": "richardwillis",
+	"icon": "icon.png",
+	"keywords": [
+		"entity",
+		"framework",
+		"migrations",
+		"entity framework",
+		".net",
+		"dotnet",
+		"core",
+		"database",
+		"efcore",
+		"ef",
+		"csharp"
+	],
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"workspaceContains:**/*.csproj"
+	],
+	"license": "SEE LICENSE IN LICENSE.md",
+	"bugs": {
+		"url": "https://github.com/badsyntax/vscode-entity-framework/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/badsyntax/vscode-entity-framework/"
+	},
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "entityframework.removeMigrations",
+				"title": "Remove Migration",
+				"icon": {
+					"light": "icons/trash_light.svg",
+					"dark": "icons/trash_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.resetMigrations",
+				"title": "Reset Migrations to Here",
+				"icon": {
+					"light": "icons/reply_light.svg",
+					"dark": "icons/reply_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.dbContextInfo",
+				"title": "Information",
+				"icon": {
+					"light": "icons/help_light.svg",
+					"dark": "icons/help_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.scaffold",
+				"title": "Scaffold",
+				"icon": {
+					"light": "icons/files_light.svg",
+					"dark": "icons/files_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.generateERD",
+				"title": "Generate ER Diagram",
+				"icon": {
+					"light": "icons/references_light.svg",
+					"dark": "icons/references_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.refreshTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "icons/refresh_light.svg",
+					"dark": "icons/refresh_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.refreshDbContextTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "icons/refresh_light.svg",
+					"dark": "icons/refresh_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.refreshProjectTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "icons/refresh_light.svg",
+					"dark": "icons/refresh_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.addMigration",
+				"title": "Add Migration",
+				"icon": {
+					"light": "icons/add_light.svg",
+					"dark": "icons/add_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.runMigration",
+				"title": "Run Migration",
+				"icon": {
+					"light": "icons/run_light.svg",
+					"dark": "icons/run_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.undoMigration",
+				"title": "Undo Migration",
+				"icon": {
+					"light": "icons/reply_light.svg",
+					"dark": "icons/reply_dark.svg"
+				}
+			},
+			{
+				"command": "entityframework.generateScript",
+				"title": "Generate Script",
+				"icon": {
+					"light": "icons/file-code_light.svg",
+					"dark": "icons/file-code_dark.svg"
+				}
+			}
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "entityframeworkTree",
+					"name": "Entity Framework"
+				}
+			]
+		},
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "entityframework.refreshTree",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.refreshProjectTree",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.refreshDbContextTree",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.removeMigrations",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.resetMigrations",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.dbContextInfo",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.scaffold",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.generateERD",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.addMigration",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.runMigration",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.undoMigration",
+					"when": "false"
+				},
+				{
+					"command": "entityframework.generateScript",
+					"when": "false"
+				}
+			],
+			"view/title": [
+				{
+					"command": "entityframework.refreshTree",
+					"when": "view == entityframeworkTree",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "entityframework.removeMigrations",
+					"when": "viewItem =~ /^migration-.*\\|?can-remove\\|?.*$/",
+					"group": "inline@1"
+				},
+				{
+					"command": "entityframework.removeMigrations",
+					"when": "viewItem =~ /^migration-.*\\|?can-remove\\|?.*$/",
+					"group": "context@2"
+				},
+				{
+					"command": "entityframework.resetMigrations",
+					"when": "viewItem =~ /^migration-.*\\|?can-reset\\|?.*$/",
+					"group": "context@3"
+				},
+				{
+					"command": "entityframework.runMigration",
+					"when": "viewItem =~ /^migration-.*\\|?can-apply\\|?.*$/",
+					"group": "inline@2"
+				},
+				{
+					"command": "entityframework.runMigration",
+					"when": "viewItem =~ /^migration-.*\\|?can-apply\\|?.*$/",
+					"group": "context@1"
+				},
+				{
+					"command": "entityframework.undoMigration",
+					"when": "viewItem =~ /^migration-.*\\|?can-undo\\|?.*$/",
+					"group": "inline@2"
+				},
+				{
+					"command": "entityframework.undoMigration",
+					"when": "viewItem =~ /^migration-.*\\|?can-undo\\|?.*$/",
+					"group": "context@1"
+				},
+				{
+					"command": "entityframework.addMigration",
+					"when": "viewItem == dbContext",
+					"group": "inline@4"
+				},
+				{
+					"command": "entityframework.addMigration",
+					"when": "viewItem == dbContext",
+					"group": "context@1"
+				},
+				{
+					"command": "entityframework.generateScript",
+					"when": "viewItem == dbContext"
+				},
+				{
+					"command": "entityframework.generateERD",
+					"when": "viewItem == dbContext"
+				},
+				{
+					"command": "entityframework.dbContextInfo",
+					"when": "viewItem == dbContext"
+				},
+				{
+					"command": "entityframework.refreshDbContextTree",
+					"when": "viewItem == dbContext"
+				},
+				{
+					"command": "entityframework.scaffold",
+					"when": "viewItem == project",
+					"group": "inline@1"
+				},
+				{
+					"command": "entityframework.scaffold",
+					"when": "viewItem == project",
+					"group": "context@1"
+				},
+				{
+					"command": "entityframework.refreshProjectTree",
+					"when": "viewItem == project",
+					"group": "context@2"
+				}
+			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "vscode-entity-framework",
+			"properties": {
+				"entityframework.env": {
+					"type": "object",
+					"default": {
+						"ASPNETCORE_ENVIRONMENT": "Development"
+					},
+					"description": "Environment variables when interacting with Entity Framework."
+				},
+				"entityframework.erDiagram": {
+					"type": "object",
+					"default": {
+						"ignoreTables": []
+					}
+				},
+				"entityframework.commands": {
+					"type": "object",
+					"default": {
+						"addMigration": [
+							"dotnet",
+							"ef",
+							"migrations",
+							"add",
+							"\"$migrationName\"",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\"",
+							"--context",
+							"\"$dbContext\""
+						],
+						"removeMigration": [
+							"dotnet",
+							"ef",
+							"migrations",
+							"remove",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\"",
+							"--context",
+							"\"$dbContext\""
+						],
+						"runMigration": [
+							"dotnet",
+							"ef",
+							"database",
+							"update",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\"",
+							"--context",
+							"\"$dbContext\"",
+							"\"$migrationId\""
+						],
+						"generateScript": [
+							"dotnet",
+							"ef",
+							"dbcontext",
+							"script",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\"",
+							"--context",
+							"\"$dbContext\""
+						],
+						"listDbContexts": [
+							"dotnet",
+							"ef",
+							"dbcontext",
+							"list",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\""
+						],
+						"listMigrations": [
+							"dotnet",
+							"ef",
+							"migrations",
+							"list",
+							"--context",
+							"\"$context\"",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\""
+						],
+						"dbContextInfo": [
+							"dotnet",
+							"ef",
+							"dbcontext",
+							"info",
+							"--context",
+							"\"$dbContext\"",
+							"--project",
+							"\"$project\"",
+							"--startup-project",
+							"\"$project\""
+						],
+						"scaffold": [
+							"dotnet",
+							"ef",
+							"dbcontext",
+							"scaffold",
+							"\"$connectionString\"",
+							"\"$provider\"",
+							"--output-dir",
+							"\"$outputDir\"",
+							"--context",
+							"\"$context\"",
+							"--project",
+							"\"$project\"",
+							"--context-dir",
+							"\"$contextDir\"",
+							"--namespace",
+							"\"$namespace\""
+						],
+						"generateERD": [
+							"dotnet",
+							"ef",
+							"dbcontext",
+							"scaffold",
+							"\"$connectionString\"",
+							"\"$provider\"",
+							"--context",
+							"\"$context\"",
+							"--project",
+							"\"$project\"",
+							"--output-dir",
+							"\"$outputDir\"",
+							"--use-database-names"
+						]
+					},
+					"description": "Custom dotnet ef commands."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile:prod",
+		"compile": "webpack",
+		"watch": "webpack --watch",
+		"compile:prod": "webpack --mode production --devtool hidden-source-map",
+		"package": "vsce package",
+		"publish": "vsce publish",
+		"lint": "npm run lint:prettier && npm run lint:ts && npm run lint:eslint",
+		"lint:ts": "tsc --noEmit",
+		"lint:fix": "npm run lint:fix:prettier && npm run lint:eslint -- --fix",
+		"lint:prettier": "prettier --check \"**/*.{js,json,svg,md,yml}\"",
+		"lint:fix:prettier": "prettier --write '**/*.{js,json,svg,md,yml}'",
+		"lint:eslint": "eslint src --ext .ts",
+		"test": "npm run wdio",
+		"wdio": "wdio run ./wdio.conf.ts"
+	},
+	"devDependencies": {
+		"@types/mocha": "^10.0.1",
+		"@types/node": "16.x",
+		"@types/vscode": "1.64.0",
+		"@typescript-eslint/eslint-plugin": "^5.48.1",
+		"@typescript-eslint/parser": "^5.48.1",
+		"@vscode/vsce": "^2.16.0",
+		"@wdio/cli": "^8.1.3",
+		"@wdio/local-runner": "^8.1.3",
+		"@wdio/mocha-framework": "^8.1.2",
+		"@wdio/spec-reporter": "^8.1.2",
+		"eslint": "^8.31.0",
+		"eslint-config-prettier": "^8.6.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"file-loader": "^6.2.0",
+		"prettier": "2.8.2",
+		"ts-loader": "^9.4.2",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.9.4",
+		"wdio-vscode-service": "^5.0.0",
+		"webpack": "^5.75.0",
+		"webpack-cli": "^5.0.1"
+	},
+	"dependencies": {
+		"nuget-deps-tree": "^0.3.0"
+	},
+	"__metadata": {
+		"id": "87687871-1242-40a2-8167-cf16b2a6599e",
+		"publisherId": "2a12cf3c-f6cd-4fa3-a6fa-7ce5ad8b3d03",
+		"publisherDisplayName": "Richard Willis",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1723914824145,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}

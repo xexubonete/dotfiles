@@ -1,0 +1,31 @@
+{
+  "editor.tabSize": 2,
+  "editor.fontSize": 11,
+  "editor.codeActionsOnSave": {},
+  "editor.cursorBlinking": "phase",
+  "editor.renderWhitespace": "none",
+  "editor.fontFamily": "FiraCode Nerd Font",
+  "editor.bracketPairColorization.enabled": false,
+  "editor.overviewRulerBorder": false,
+  "editor.minimap.enabled": false,
+  "editor.glyphMargin": false,
+  "editor.folding": false,
+
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+
+  "workbench.colorTheme": "Minimal",
+  "workbench.iconTheme": "quill-icons-minimal",
+  "workbench.editor.tabCloseButton": "off",
+  "workbench.layoutControl.enabled": false,
+  "workbench.activityBar.visible": false,
+  "workbench.statusBar.visible": false,
+  "workbench.editor.showIcons": false,
+  "workbench.tree.indent": 16,
+
+  "terminal.integrated.fontSize": 11,
+  "terminal.integrated.defaultProfile.osx": "zsh"
+}

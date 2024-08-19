@@ -1,0 +1,36 @@
+{
+	"name": "minimalist-dark",
+	"publisher": "nichabosh",
+	"displayName": "Minimal",
+	"icon": "assets/icon.png",
+	"description": "A minimalist theme for VSCode.",
+	"version": "1.0.0",
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Minimal",
+				"uiTheme": "vs-dark",
+				"path": "./themes/minimal.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "c1aa4b50-c53b-4aae-9abd-f209788368e2",
+		"publisherId": "82540ac6-cafe-4932-8567-be12338697be",
+		"publisherDisplayName": "nichabosh",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1724083705109,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}

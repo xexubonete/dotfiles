@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksidebar=self.webpackChunksidebar||[]).push([[7122],{97122:(e,s,r)=>{r.r(s),r.d(s,{default:()=>o}),r(40540);var a=r(21180),t=r(52322);const o=()=>(0,t.jsx)(a.GenericErrorMessage,{illustration:"illustration-choose-workspace",title:"You haven't selected a workspace yet.",description:"Select a workspace in order to see your data."})}}]);
+//# sourceMappingURL=7122.4475fbd8fcc88a00.js.map

@@ -1,0 +1,276 @@
+{
+	"name": "docomment",
+	"version": "1.0.0",
+	"publisher": "k--kato",
+	"engines": {
+		"vscode": "^1.76.0"
+	},
+	"displayName": "C# XML Documentation Comments",
+	"description": "Generate C# XML documentation comments for ///",
+	"categories": [
+		"Other"
+	],
+	"galleryBanner": {
+		"color": "#4F87FF",
+		"theme": "light"
+	},
+	"main": "./dist/extension-node",
+	"browser": "./dist/web/extension.js",
+	"contributes": {
+		"configuration": {
+			"type": "object",
+			"title": "C# XML Documentation Comments configuration",
+			"properties": {
+				"docomment.syntax": {
+					"type": "string",
+					"enum": [
+						"single",
+						"delimited"
+					],
+					"default": "single",
+					"description": "Comments are single-line comments that start with three slashes (///) (\"single\"), or delimited comments that start with a slash and two stars (/**) (\"delimited\")."
+				},
+				"docomment.activateOnEnter": {
+					"type": "boolean",
+					"default": false,
+					"description": "Press the Enter key to activate a command."
+				},
+				"docomment.advanced": {
+					"type": "object",
+					"description": "User-controllable options.",
+					"properties": {
+						"cs": {
+							"type": "object",
+							"description": "C# options.",
+							"properties": {
+								"namespace": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"class": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"typeparam"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"interface": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"typeparam"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"struct": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"enum": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"delegate": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"param",
+												"typeparam",
+												"returns"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"field": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"value"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"property": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"value"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"method": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary",
+												"param",
+												"typeparam",
+												"returns"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								},
+								"event": {
+									"type": "object",
+									"properties": {
+										"attributes": {
+											"type": "array",
+											"default": [
+												"summary"
+											],
+											"items": {
+												"attribute": {
+													"type": "string"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"activationEvents": [
+		"onLanguage:csharp",
+		"onLanguage:aspnetcorerazor"
+	],
+	"keywords": [
+		"XML Documentation Comments",
+		"C#",
+		"Blazor"
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"@types/node": "^18.15.0",
+		"@types/vscode": "^1.76.0",
+		"@types/webpack-env": "^1.18.0",
+		"eslint": "^8.36.0",
+		"ts-loader": "^9.4.2",
+		"typescript": "^4.9.5",
+		"webpack": "^5.76.1",
+		"webpack-cli": "^5.0.1"
+	},
+	"extensionDependencies": [],
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"compile": "webpack",
+		"watch": "webpack --watch",
+		"package": "webpack --mode production --devtool hidden-source-map"
+	},
+	"icon": "images/docomment.png",
+	"license": "MIT",
+	"homepage": "https://github.com/kasecato/vscode-docomment#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kasecato/vscode-docomment"
+	},
+	"bugs": {
+		"url": "https://github.com/kasecato/vscode-docomment/issues"
+	},
+	"sponsor": {
+		"url": "https://github.com/sponsors/kasecato"
+	},
+	"__metadata": {
+		"id": "d1a2eab4-aa6e-4094-93b3-6a007f60bd9d",
+		"publisherId": "42d9583b-423d-428d-933b-b906585dbaa2",
+		"publisherDisplayName": "Keisuke Kato",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1723914823913,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}

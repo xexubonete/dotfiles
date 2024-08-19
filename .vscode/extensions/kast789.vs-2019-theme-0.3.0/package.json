@@ -1,0 +1,36 @@
+{
+	"name": "vs-2019-theme",
+	"displayName": "Visual Studio 2019 Theme",
+	"description": "The dark theme of Visual Studio 2019 now in Visual Studio Code",
+	"version": "0.3.0",
+	"icon": "images/themeIcon.png",
+	"publisher": "kast789",
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Themes"
+	],
+	"contributes": {
+		"themes": [
+			{
+				"label": "Visual Studio 2019 Theme",
+				"uiTheme": "vs-dark",
+				"path": "./themes/Visual Studio 2019 Theme-color-theme.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "18fff3f8-31f1-493a-b124-adadf3a3201a",
+		"publisherId": "26e7eeaa-d366-4874-a9f5-11470ab770e3",
+		"publisherDisplayName": "kast789",
+		"targetPlatform": "undefined",
+		"isApplicationScoped": false,
+		"isPreReleaseVersion": false,
+		"hasPreReleaseVersion": false,
+		"installedTimestamp": 1723914823473,
+		"pinned": false,
+		"preRelease": false,
+		"source": "gallery"
+	}
+}

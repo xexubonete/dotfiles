@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "dependencies": {
+    "@microsoft/codecoverage-vscode-services.darwin-arm64": "17.12.0-preview.24375.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://devdiv.visualstudio.com/DevDiv/_git/vs-code-coverage",
+    "branch": "main"
+  },
+  "unoptimizedAlternatives": {
+    "@microsoft/codecoverage-vscode-services.darwin-arm64": "@microsoft/codecoverage-vscode-services.darwin-arm64.unoptimized"
+  }
+}

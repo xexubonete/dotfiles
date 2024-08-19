@@ -1,0 +1,6 @@
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/**!
+ * Originally written by:
+ * https://github.com/sindresorhus/parse-json
+ */

@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkmimir_editor=self.webpackChunkmimir_editor||[]).push([[2223],{92223:(e,t,n)=>{n.r(t),n.d(t,{ReactQueryDevtools:()=>r,ReactQueryDevtoolsPanel:()=>u});const r=function(){return null},u=function(){return null}}}]);
+//# sourceMappingURL=2223.9c427b15541a1114.js.map

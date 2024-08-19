@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcollection_workbench=self.webpackChunkcollection_workbench||[]).push([[5650],{25650:(e,c,l)=>{l.r(c),l.d(c,{default:()=>k.Z});var k=l(87875)}}]);

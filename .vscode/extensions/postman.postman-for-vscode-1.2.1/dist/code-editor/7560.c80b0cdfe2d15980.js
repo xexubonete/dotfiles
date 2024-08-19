@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkcode_editor=self.webpackChunkcode_editor||[]).push([[7560],{7560:(e,t,r)=>{function n(){return n=Object.assign?Object.assign.bind():function(e){for(var t=1;t<arguments.length;t++){var r=arguments[t];for(var n in r)Object.prototype.hasOwnProperty.call(r,n)&&(e[n]=r[n])}return e},n.apply(this,arguments)}r.d(t,{Z:()=>n})}}]);
+//# sourceMappingURL=7560.c80b0cdfe2d15980.js.map
