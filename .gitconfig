@@ -15,3 +15,7 @@
 	df = diff -w --word-diff=color --ignore-space-at-eol
 [pull]
 	ff = only
+[http]
+# To push large files or heavy amount of kB 
+	postBuffer = 524288000
+
