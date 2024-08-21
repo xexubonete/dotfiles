@@ -21,3 +21,7 @@
 : 1724174158:0;sudo pmset -a standbydelaylow 600\
 : 1724189157:0;sudo pmset -a tcpkeepalive 1
 : 1724189481:0;sudo pmset -a tcpkeepalive 0
+
+
+: defaults write com.apple.finder CreateDesktop -bool false
+: killall Finder
