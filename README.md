@@ -11,7 +11,7 @@ This repository contains my shell script to set up essential tools, applications
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/yourusername/dotfiles.git
+    git clone https://github.com/xexubonete/dotfiles.git
     cd dotfiles
     ```
 
