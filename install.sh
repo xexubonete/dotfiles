@@ -44,3 +44,4 @@ brew install sketchybar
 
 cp -f ./yabai/.yabairc ~/
 cp -f ./sketchybar ~/
+cp -f ./zsh/.zshrc ~/
