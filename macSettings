@@ -22,6 +22,8 @@
 : 1724189157:0;sudo pmset -a tcpkeepalive 1
 : 1724189481:0;sudo pmset -a tcpkeepalive 0
 
+: sudo nvram AutoBoot=%00
+: sudo nvram AutoBoot=%00.
 
 : defaults write com.apple.finder CreateDesktop -bool false
 : killall Finder
