@@ -29,10 +29,10 @@ yabai -m config                                 \
     split_type                   auto           \
     auto_balance                 off            \
     top_padding                  20              \
-    bottom_padding               0              \
-    left_padding                 0             \
-    right_padding                0             \
-    window_gap                   1             \
+    bottom_padding               3              \
+    left_padding                 3             \
+    right_padding                3             \
+    window_gap                   3             \
     layout                       bsp            \
     mouse_modifier               fn             \
     mouse_action1                move           \
@@ -40,23 +40,32 @@ yabai -m config                                 \
     mouse_drop_action            swap
 
 # Exclude some app that not match with yabai ratio
-yabai -m rule --add app="^(Actualización de software|Diccionario|VLC|Preferencias del Sistema|Configuración del Sistema|zoom.us|Photo Booth|Utilidad de Archivos|App Store|Monitor de Actividad|Música)$" manage=off
+yabai -m rule --add app="^(Actualización de software|Diccionario|VLC|Preferencias del Sistema|Ajustes del Sistema|zoom.us|Fotos|FaceTime|Vista Previa|Mensajes|Notas|Utilidad de Discos|App Store|Monitor de Actividad|Música|Calendario|Contactos|Recordatorios)$" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
 yabai -m rule --add label="Acerca de este Mac" app="System Information" title="Acerca de este Mac" manage=off
 
 # Borders focus
-borders active_color=0xfffffff0 inactive_color=0x00000000 width=1 &
+borders active_color=0xffffffff inactive_color=0x00000000 width=2 &
 
-# Script to create te 3 desktops
-# osascript -e '
-# tell application "System Events"
-#     key code 126 using control down -- Abrir Mission Control
-#     delay 0.3
-#     do shell script "cliclick m:1655,0"
-#     do shell script "cliclick c:1655,60"
-#     do shell script "cliclick c:1655,60"
-# end tell
-# '
+# Script to create te 9 desktops
+spaces=$(yabai -m query --spaces | jq length)
 
-sudo brew services restart sketchybar
-echo "yabai configuration loaded.."
+if [ "$spaces" -ge 5 ]; then
+    exit 0
+fi
+
+osascript <<EOF
+tell application "System Events"
+    key code 126 using control down
+    delay 0.3
+    do shell script "cliclick m:1655,0"
+    repeat $((5 - spaces)) times
+        do shell script "cliclick c:1655,60"
+    end repeat
+end tell
+EOF
+
+
+# sudo brew services restart sketchybar
+# echo "yabai configuration loaded.."
+reset
