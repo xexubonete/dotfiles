@@ -8,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME=""
+ZSH_THEME="amuse"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -70,6 +70,7 @@ ZSH_THEME=""
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+
 plugins=(
 git
 zsh-autosuggestions
@@ -78,12 +79,11 @@ npm
 pnpm
 brew
 dotnet
-asdf
 )
 
 source $ZSH/oh-my-zsh.sh
 
-
+omz update
 
 # User configuration
 
@@ -112,10 +112,82 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ll="ls --color -la -h"
 alias ls="ls --color -la -h"
+alias git="g"
+# Function to restart skhd using LaunchAgents (proper macOS way)
+restart_skhd() {
+    echo "Restarting skhd services via LaunchAgents..."
+    
+    # Stop all skhd LaunchAgents
+    launchctl unload ~/Library/LaunchAgents/com.koekeishiya.skhd.plist 2>/dev/null
+    launchctl unload ~/Library/LaunchAgents/com.usuario.skhd.plist 2>/dev/null
+    
+    # Kill any remaining processes
+    pkill -9 -f skhd 2>/dev/null
+    
+    # Wait for processes to terminate
+    sleep 2
+    
+    # Clean up PID files
+    rm -f /tmp/skhd_*.pid 2>/dev/null
+    
+    echo "Starting skhd services..."
+    
+    # Start the primary skhd service
+    launchctl load ~/Library/LaunchAgents/com.koekeishiya.skhd.plist 2>/dev/null
+    
+    # Give it time to start
+    sleep 2
+    
+    # Verify skhd is running
+    local running_processes=$(ps aux | grep "[s]khd" | wc -l)
+    if [ $running_processes -eq 1 ]; then
+        echo "Skhd service restarted successfully! (1 process running)"
+        echo "Active LaunchAgents:"
+        launchctl list | grep skhd
+    elif [ $running_processes -gt 1 ]; then
+        echo "Warning: Multiple skhd processes detected ($running_processes processes)"
+        ps aux | grep "[s]khd"
+    else
+        echo "Error: skhd failed to start. Trying alternative service..."
+        launchctl load ~/Library/LaunchAgents/com.usuario.skhd.plist 2>/dev/null
+        sleep 1
+        if pgrep -f "skhd" > /dev/null; then
+            echo "Skhd started with alternative service!"
+        else
+            echo "Error: Unable to start skhd with any method"
+        fi
+    fi
+}
+
+# Function to reset all window management services
+reset_wm() {
+    yabai --stop-service > /dev/null 2>&1
+    yabai --start-service > /dev/null 2>&1
+    brew services restart sketchybar > /dev/null 2>&1
+    restart_skhd
+    echo "All services reset!"
+}
+
+# Alias for backward compatibility
+alias reset=reset_wm
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 eval "$(starship init zsh)"
 
 #HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
+export PATH="$PATH:/Applications/Rider.app/Contents/MacOS"
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+fpath=(${ASDF_DIR}/libexec/completions $fpath)
+autoload -Uz compinit && compinit
+
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# bun completions
+[ -s "/Users/xexu/.bun/_bun" ] && source "/Users/xexu/.bun/_bun"
