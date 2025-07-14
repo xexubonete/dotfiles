@@ -191,3 +191,4 @@ export NVM_DIR="$HOME/.nvm"
 
 # bun completions
 [ -s "/Users/xexu/.bun/_bun" ] && source "/Users/xexu/.bun/_bun"
+

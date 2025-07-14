@@ -44,8 +44,14 @@ yabai -m rule --add app="^(Actualización de software|Diccionario|VLC|Preferenci
 yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
 yabai -m rule --add label="Acerca de este Mac" app="System Information" title="Acerca de este Mac" manage=off
 
+# When user close a windown then focus the next inmediatly
+yabai -m signal --add event=window_destroyed action="\
+  yabai -m window --focus mouse || \
+  yabai -m query --windows --window &> /dev/null || \
+  yabai -m window --focus $(yabai -m query --windows --space | jq '.[0].id') &> /dev/null"
+
 # Borders focus
-borders active_color=0xffffffff inactive_color=0x00000000 width=2 &
+borders active_color=0x80ffffff inactive_color=0x00000000 width=2 &
 
 # Script to create te 9 desktops
 spaces=$(yabai -m query --spaces | jq length)
@@ -64,9 +70,6 @@ tell application "System Events"
     end repeat
 end tell
 EOF
-
-
-
 
 reset
 echo "Yabai service reset!"
