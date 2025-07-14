@@ -170,6 +170,7 @@ reset_wm() {
 
 # Alias for backward compatibility
 alias reset=reset_wm
+alias gitch=~/gitch.sh
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 eval "$(starship init zsh)"
