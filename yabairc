@@ -29,10 +29,10 @@ yabai -m config                                 \
     split_type                   auto           \
     auto_balance                 off            \
     top_padding                  20              \
-    bottom_padding               3              \
-    left_padding                 3             \
-    right_padding                3             \
-    window_gap                   3             \
+    bottom_padding               1              \
+    left_padding                 1            \
+    right_padding                1             \
+    window_gap                   1             \
     layout                       bsp            \
     mouse_modifier               fn             \
     mouse_action1                move           \
