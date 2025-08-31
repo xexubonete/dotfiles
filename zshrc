@@ -161,12 +161,26 @@ restart_skhd() {
 
 # Function to reset all window management services
 reset_wm() {
-    yabai --stop-service > /dev/null 2>&1
-    yabai --start-service > /dev/null 2>&1
+  yabai --stop-service > /dev/null 2>&1
+  yabai --start-service > /dev/null 2>&1
     brew services restart sketchybar > /dev/null 2>&1
-    restart_skhd
-    echo "All services reset!"
+  restart_skhd
+  echo "All services reset!"
 }
+# Función para cerrar todas las aplicaciones de macOS (excepto Finder y Terminal)
+function killapps() {
+  osascript -e '
+    tell application "System Events" 
+      set quitApps to (name of every process whose background only is false and name is not "Finder" and name is not "Terminal")
+      repeat with appName in quitApps
+        try
+          do shell script "killall -9 " & quoted form of appName
+        end try
+      end repeat
+    end tell
+  '
+}
+alias kapps="killapps"
 
 # Alias for backward compatibility
 alias reset=reset_wm
