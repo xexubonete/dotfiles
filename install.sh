@@ -74,21 +74,17 @@ brew services stop sketchybar && brew services start sketchybar
 brew install --cask sf-symbols
 brew tap FelixKratz/formulae
 
-
-# cp -f ./yabai/.yabairc ~/
-# cp -f ./sketchybar/ ~/
-# cp -f .zshrc ~/
-cp -f gitch.sh ~/
-
 mv /Users/$USER/Downloads/dotfiles-main/skhdrc /Users/$USER/.skhdrc
 mv /Users/$USER/Downloads/dotfiles-main/yabairc /Users/$USER/.yabairc
 mv /Users/$USER/Downloads/dotfiles-main/.zshrc /Users/$USER/.zshrc
+mv /Users/$USER/Downloads/dotfiles-main/gitch.sh /Users/$USER/.gitch.sh
 
 mkdir /Users/$USER/dev
 git clone https://github.com/xexubonete/sketchybar.git /Users/$USER/.config/sketchybar
-# cp -r sketchybar-lua/src ~/.config/sketchybar
 
 sudo yabai --install-service
 sudo skhd --install-service
 yabai --start-service
 skhd --start-service
+
+reset
