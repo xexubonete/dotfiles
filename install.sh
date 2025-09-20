@@ -6,19 +6,13 @@ fi
 USER=$1
 EMAIL=$2
 
-# Función para mantener sudo activo
-keep_sudo_alive() {
-    while true; do
-        sudo -n true
-        sleep 1
-        kill -0 "$$" 2>/dev/null || exit
-    done &
-}
+echo "🔐 Configurando permisos de sudo..."
+echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/install_script
+sudo chmod 0440 /etc/sudoers.d/install_script
 
 # Pedir contraseña y mantener sudo activo
 echo "🔐 Por favor, introduce tu contraseña para operaciones privilegiadas:"
 sudo -v
-keep_sudo_alive
 
 echo "🚀 Iniciando script de instalación..."
 echo "👤 Usuario: $USER"
@@ -116,8 +110,11 @@ sudo skhd --install-service
 yabai --start-service
 skhd --start-service
 
+echo "🔒 Restaurando configuración de sudo..."
+sudo rm /etc/sudoers.d/install_script
+
 echo "✨ Instalación completada! ✨"
 
 kill $KEEP_SUDO_PID 2>/dev/null
 
-resett
+reset
