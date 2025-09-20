@@ -6,13 +6,19 @@ fi
 USER=$1
 EMAIL=$2
 
-# Pedir la contraseña una sola vez y mantenerla
+# Función para mantener sudo activo
+keep_sudo_alive() {
+    while true; do
+        sudo -n true
+        sleep 50
+        kill -0 "$$" 2>/dev/null || exit
+    done &
+}
+
+# Pedir contraseña y mantener sudo activo
 echo "🔐 Por favor, introduce tu contraseña para operaciones privilegiadas:"
 sudo -v
-
-# Mantener sudo activo durante la ejecución del script
-(while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null) &
-KEEP_SUDO_PID=$!
+keep_sudo_alive
 
 echo "🚀 Iniciando script de instalación..."
 echo "👤 Usuario: $USER"
