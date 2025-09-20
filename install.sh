@@ -98,7 +98,7 @@ echo "📁 Moviendo archivos de configuración..."
 mv /Users/$USER/Downloads/dotfiles/skhdrc /Users/$USER/.skhdrc
 mv /Users/$USER/Downloads/dotfiles/yabairc /Users/$USER/.yabairc
 cp /Users/$USER/Downloads/dotfiles/.zshrc /Users/$USER/.zshrc
-mv /Users/$USER/Downloads/dotfiles/gitch.sh /Users/$USER/.gitch.sh
+mv /Users/$USER/Downloads/dotfiles/gitch.sh /Users/$USER/gitch.sh
 cp -r /Users/$USER/Downloads/dotfiles/sketchybar-system-stats/ /Users/$USER/.config/sketchybar-system-stats
 
 echo "📂 Creando directorio de desarrollo..."
