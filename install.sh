@@ -5,86 +5,113 @@ fi
 
 USER=$1
 EMAIL=$2
-# First of all, install Xcode
+
+# Pedir la contraseña una sola vez y mantenerla
+echo "🔐 Por favor, introduce tu contraseña para operaciones privilegiadas:"
+sudo -v
+
+# Mantener sudo activo durante la ejecución del script
+(while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null) &
+KEEP_SUDO_PID=$!
+
+echo "🚀 Iniciando script de instalación..."
+echo "👤 Usuario: $USER"
+echo "📧 Email: $EMAIL"
+
+echo "📦 Instalando Xcode..."
 xcode-select --install
 
-# Primero instalar Homebrew
+echo "🍺 Instalando Homebrew..."
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Crear el archivo .zprofile si no existe
+touch /Users/$USER/.zprofile
+
+# Ahora podemos modificar los permisos y la propiedad
 chmod +x /Users/$USER/.zprofile
 sudo chown $USER /Users/$USER/.zprofile
-sudo echo >> /Users/$USER/.zprofile
-sudo echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
+
+# Añadir la configuración de Homebrew
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 brew --version
 
-# Agrupar todos los taps al inicio
-brew tap koekeishiya/formulae     # Para yabai y skhd
-brew tap FelixKratz/formulae      # 
+echo "🔄 Configurando taps de Homebrew..."
+brew tap koekeishiya/formulae
+brew tap FelixKratz/formulae
 
-# Execute macConfig.sh script 
+echo "⚙️ Ejecutando configuración de macOS..."
 sh ./.macConfig.sh
 
-# Execute setup_gitconfig.sh script
+echo "🔧 Configurando Git..."
 sudo sh ./git/setup_gitconfig.sh "$USER" "$EMAIL"
 
-# Tools
-brew install bitwarden
-brew install warp
-Brew install bruno
+echo "📱 Instalando aplicaciones..."
+brew install bitwarden && echo "✅ Bitwarden instalado"
+brew install warp && echo "✅ Warp instalado"
+brew install bruno && echo "✅ Bruno instalado"
+brew install chatgpt && echo "✅ ChatGPT instalado"
+brew install discord && echo "✅ Discord instalado"
+brew install nordvpn && echo "✅ NordVPN instalado"
+brew install notion && echo "✅ Notion instalado"
+brew install google-chrome && echo "✅ Chrome instalado"
+brew install microsoft-teams && echo "✅ Teams instalado"
+brew install orbstack && echo "✅ Orbstack instalado"
+brew install --cask pgadmin4 && echo "✅ pgAdmin4 instalado"
+brew install postgresql && echo "✅ PostgreSQL instalado"
+brew install whatsapp && echo "✅ WhatsApp instalado"
+brew install visual-studio-code && echo "✅ VS Code instalado"
+brew install rider && echo "✅ Rider instalado"
 
-brew install chatgpt
-brew install discord
-brew install nordvpn
-
-brew install notion
-brew install google-chrome
-brew install microsoft-teams
-brew install orbstack
-
-brew install --cask pgadmin4
-brew install postgresql
-brew install whatsapp
-
-brew install visual-studio-code
-brew install rider
-
+echo "🛠️ Configurando entorno ZSH..."
 brew install zsh
 brew install starship
 brew install utm
 eval "$(starship init zsh)"
 brew install --cask font-hack-nerd-font
 
+echo "🔄 Cambiando shell por defecto a ZSH..."
 chsh -s $(which zsh)
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# Instalar oh-my-zsh sin ejecutar zsh automáticamente
+RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# Environment
+echo "🖥️ Instalando herramientas del entorno..."
 brew tap koekeishiya/formulae
-brew install koekeishiya/formulae/skhd
-brew install lua luarocks
-brew install borders
+brew install koekeishiya/formulae/skhd && echo "✅ SKHD instalado"
+brew install lua luarocks && echo "✅ Lua instalado"
+brew install borders && echo "✅ Borders instalado"
 
+echo "🪟 Instalando y configurando Yabai..."
 brew install --HEAD koekeishiya/formulae/yabai
 sudo visudo -f /private/etc/sudoers.d/yabai  
 echo "$(whoami) ALL=(root) NOPASSWD: $(which yabai) --load-sa" | sudo tee /private/etc/sudoers.d/yabai
 sudo chmod 644 /private/etc/sudoers.d/yabai
 
-rew install sketchybar --HEAD
+echo "📊 Instalando y configurando Sketchybar..."
+brew install sketchybar --HEAD
 cd /tmp && git clone https://github.com/FelixKratz/SbarLua.git && cd SbarLua && make install
 brew services stop sketchybar && brew services start sketchybar
 brew install --cask sf-symbols
 brew tap FelixKratz/formulae
 
+echo "📁 Moviendo archivos de configuración..."
 mv /Users/$USER/Downloads/dotfiles-main/skhdrc /Users/$USER/.skhdrc
 mv /Users/$USER/Downloads/dotfiles-main/yabairc /Users/$USER/.yabairc
 mv /Users/$USER/Downloads/dotfiles-main/.zshrc /Users/$USER/.zshrc
 mv /Users/$USER/Downloads/dotfiles-main/gitch.sh /Users/$USER/.gitch.sh
 
+echo "📂 Creando directorio de desarrollo..."
 mkdir /Users/$USER/dev
 git clone https://github.com/xexubonete/sketchybar.git /Users/$USER/.config/sketchybar
 
+echo "🔄 Iniciando servicios..."
 sudo yabai --install-service
 sudo skhd --install-service
 yabai --start-service
 skhd --start-service
 
-reset
+echo "✨ Instalación completada! ✨"
+
+kill $KEEP_SUDO_PID 2>/dev/null
+
+resett
