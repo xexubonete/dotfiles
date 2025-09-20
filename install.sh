@@ -10,7 +10,7 @@ EMAIL=$2
 keep_sudo_alive() {
     while true; do
         sudo -n true
-        sleep 50
+        sleep 1
         kill -0 "$$" 2>/dev/null || exit
     done &
 }
