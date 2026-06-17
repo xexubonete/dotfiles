@@ -19,6 +19,15 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 echo "📦 brew bundle (taps, CLIs, apps y extensiones de VS Code)…"
 brew bundle --file="$DOTFILES/Brewfile"
 
+echo "🐚 oh-my-zsh + plugins (los necesita .zshrc)…"
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+fi
+
 # enlaza <ruta-en-repo> -> <destino-en-el-sistema>
 link() {
   local src="$DOTFILES/$1" dst="$2"

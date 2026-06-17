@@ -60,6 +60,16 @@ Setup anterior, ya no en uso (antes usaba yabai + sketchybar + borders):
 
 Se conserva por si alguna vez vuelvo a ese stack.
 
+## Qué NO se reproduce solo (pasos manuales)
+
+El repo deja un Mac nuevo al ~85-90%. Lo que hay que rematar a mano:
+
+- **Permisos de macOS**: concede a **komorebi** y **skhd** *Grabación de pantalla* y *Accesibilidad* en Ajustes → Privacidad y seguridad (no se pueden scriptar).
+- **Sesiones/cuentas de apps**: Bitwarden, Teams, NordVPN, OneDrive, Notion, etc. (re-login).
+- **Raycast** y **Rider/JetBrains**: su configuración se sincroniza por **su propia nube/cuenta**, no por este repo. Activa su sync nativo.
+- **Ajustes de macOS** no incluidos en `macos-defaults.sh` (es un set curado: apariencia, Dock, hot corners, Finder; no captura cada toggle del sistema).
+- **Apps fijadas en el Dock**: son las de macOS por defecto; no se versionan.
+
 ## Licencia
 
 MIT.
