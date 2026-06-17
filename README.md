@@ -64,7 +64,7 @@ Se conserva por si alguna vez vuelvo a ese stack.
 
 El repo deja un Mac nuevo al ~85-90%. Lo que hay que rematar a mano:
 
-- **Permisos de macOS**: concede a **komorebi** y **skhd** *Grabación de pantalla* y *Accesibilidad* en Ajustes → Privacidad y seguridad (no se pueden scriptar).
+- **Permisos de macOS**: `install.sh` te abre los paneles de *Accesibilidad* y *Grabación de pantalla*; solo tienes que activar **komorebi** y **skhd** (1 clic cada uno). No se pueden conceder por script en un Mac con SIP activado — y **komorebi NO necesita SIP desactivado**, así que déjalo como viene (activado, más seguro).
 - **Sesiones/cuentas de apps**: Bitwarden, Teams, NordVPN, OneDrive, Notion, etc. (re-login).
 - **Raycast** y **Rider/JetBrains**: su configuración se sincroniza por **su propia nube/cuenta**, no por este repo. Activa su sync nativo.
 - **Ajustes de macOS** no incluidos en `macos-defaults.sh` (es un set curado: apariencia, Dock, hot corners, Finder; no captura cada toggle del sistema).

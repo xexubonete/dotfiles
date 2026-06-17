@@ -57,10 +57,30 @@ link vscode/settings.json        "$HOME/Library/Application Support/Code/User/se
 echo "⚙️  Ajustes de macOS (Dock, hot corners, energía)… (puede pedir contraseña)"
 sh "$DOTFILES/macos-defaults.sh"
 
+echo "🪟 Autostart de komorebi (LaunchAgent: arranca ahora y al iniciar sesión)…"
+# Se lanza vía launchd en tu sesión gráfica → dispara los avisos de permisos de macOS.
+# komorebi NO necesita SIP desactivado (a diferencia de yabai): deja SIP como esté.
+komorebic enable-autostart --bar 2>/dev/null || true
+
+echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
+echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
+open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"  2>/dev/null || true
+open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"  2>/dev/null || true
+if [ -t 0 ]; then printf "   Pulsa Enter cuando los hayas concedido… "; read -r _; fi
+
 echo "🔧 Git: configura tu nombre/email con"
 echo "      sh git/setup_gitconfig.sh \"Tu Nombre\" tu@email"
 
+if [ -t 0 ]; then
+  printf "🔑 ¿Iniciar sesión ahora en gh y az? [y/N] "; read -r _login
+  case "$_login" in
+    y|Y)
+      command -v gh >/dev/null 2>&1 && gh auth login || true
+      command -v az >/dev/null 2>&1 && az login   || true
+      ;;
+  esac
+fi
+
 echo
-echo "✅ Hecho. Arranca el gestor de ventanas con:"
-echo "      komorebic start --bar"
-echo "   (concede permiso de Grabación de pantalla a komorebi la primera vez)"
+echo "✅ Hecho. komorebi quedará activo y arrancará solo al iniciar sesión."
+echo "   (No hace falta desactivar SIP; con conceder Accesibilidad + Grabación de pantalla basta.)"
