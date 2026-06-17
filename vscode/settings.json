@@ -1,0 +1,121 @@
+{
+    "security.workspace.trust.untrustedFiles": "open",
+    "terminal.integrated.fontFamily": "Hack Nerd Font",
+    "editor.fontFamily": "Hack Nerd Font, Menlo, Monaco, 'Courier New', monospace",
+    "omnisharp.dotNetCliPaths": [
+        "/usr/local/share/dotnet/x64/dotnet"
+    ],
+    "projectManager.git.baseFolders": [
+        "",
+        ""
+    ],
+    "workbench.colorTheme": "GitHub Dark Default",
+    "git.autofetch": true,
+    "explorer.confirmDelete": false,
+    "dotnet.server.useOmnisharp": true,
+    "workbench.iconTheme": "material-icon-theme",
+    "chat.instructionsFilesLocations": {
+        ".github/instructions": true,
+        ".claude/rules": true,
+        "~/.copilot/instructions": true,
+        "~/.claude/rules": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-http-request-post-response.instructions.md": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-http-request-pre-request.instructions.md": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-collections-post-response.instructions.md": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-collections-pre-request.instructions.md": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-folder-post-response.instructions.md": true,
+        "/var/folders/w6/xh9mfshx3jsbktcytwrp0s340000gn/T/postman-folder-pre-request.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-collections-post-response.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-collections-pre-request.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-folder-post-response.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-http-request-post-response.instructions.md": true,
+        "C:\\Users\\xexub\\AppData\\Local\\Temp\\postman-http-request-pre-request.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-collections-post-response.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-collections-pre-request.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-folder-post-response.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-folder-pre-request.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-http-request-post-response.instructions.md": true,
+        "/var/folders/b2/2_kptj7d7wn_jx3c_ybzl5dr0000gn/T/postman-http-request-pre-request.instructions.md": true
+    },
+    "redhat.telemetry.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "*.ts": "${capture}.js",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+        "*.jsx": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.db": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.s3db": "${capture}.${extname}-*"
+    },
+    "docker.extension.enableComposeLanguageServer": false,
+    "terminal.integrated.automationProfile.windows": {},
+    "diffEditor.ignoreTrimWhitespace": false,
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "atlascode.rovodev.showEntitlementNotifications": false,
+    "json.schemaDownload.trustedDomains": {
+        "https://schemastore.azurewebsites.net/": true,
+        "https://raw.githubusercontent.com/": true,
+        "https://www.schemastore.org/": true,
+        "https://json.schemastore.org/": true,
+        "https://json-schema.org/": true,
+        "https://biomejs.dev": true
+    },
+    "chat.tools.terminal.autoApprove": {
+        "/^komorebic reload-configuration 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "dotnet build": true
+    },
+    "chat.mcp.gallery.enabled": true,
+    "git.confirmSync": false,
+    "claudeCode.preferredLocation": "panel",
+    "mssql.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "ROOT"
+        }
+    ],
+    "mssql.connections": [
+        {
+            "profileName": "Localhost (Docker)",
+            "server": "127.0.0.1,1433",
+            "database": "",
+            "authenticationType": "SqlLogin",
+            "user": "sa",
+            "password": "",
+            "savePassword": true,
+            "encrypt": "Mandatory",
+            "trustServerCertificate": true,
+            "groupId": "ROOT",
+            "profileSource": 0,
+            "id": "76d69361-8b0e-4ef0-a94d-b7eaf4c51225",
+            "containerName": "sqlserver"
+        },
+        {
+            "server": "127.0.0.1,1433",
+            "database": "master",
+            "authenticationType": "SqlLogin",
+            "user": "sa",
+            "password": "",
+            "savePassword": true,
+            "encrypt": "Mandatory",
+            "trustServerCertificate": true,
+            "groupId": "ROOT",
+            "profileSource": 1,
+            "id": "4c5629e8-737d-49ac-88e9-d29c59e029e2",
+            "connectTimeout": 15,
+            "commandTimeout": 30,
+            "applicationName": "vscode-mssql",
+            "containerName": "sqlserver"
+        }
+    ],
+}

@@ -1,79 +1,65 @@
 # Dotfiles
 
-This repository contains my shell script to set up essential tools, applications, and development environments on a macOS system using Homebrew. The script requires two parameters: a username and an email address.
+Configuración de mi Mac (Apple Silicon): apps, CLIs y dotfiles, reproducible de
+cero con Homebrew. El gestor de ventanas es **komorebi-for-mac** + **skhd**.
 
-## Prerequisites
+## Instalación en un Mac nuevo
 
-- [Homebrew](https://brew.sh/)
+```sh
+git clone https://github.com/xexubonete/dotfiles.git
+cd dotfiles
+./install.sh
+```
 
-## Installation
+`install.sh` es idempotente:
 
-1. Clone the repository:
+1. Instala Homebrew si falta.
+2. `brew bundle` con el [`Brewfile`](Brewfile): taps, CLIs, apps (casks) y extensiones de VS Code.
+3. Enlaza (symlink) las configuraciones a su sitio, haciendo backup de lo que hubiera (`*.bak.<timestamp>`).
+4. Aplica los ajustes de macOS de [`macos-defaults.sh`](macos-defaults.sh) (Dock, hot corners, energía).
+5. Recuerda configurar Git con `git/setup_gitconfig.sh "Nombre" email`.
 
-    ```sh
-    git clone https://github.com/xexubonete/dotfiles.git
-    cd dotfiles
-    ```
+Después, arranca el gestor de ventanas:
 
-2. Make the script executable:
+```sh
+komorebic start --bar   # concede Grabación de pantalla a komorebi la 1ª vez
+```
 
-    ```sh
-    chmod +x install.sh
-    ```
+## Estructura
 
-3. Run the script with your username and email as parameters:
+| Carpeta / archivo      | Qué es | Destino |
+|------------------------|--------|---------|
+| `Brewfile`             | Apps, CLIs y extensiones de VS Code | `brew bundle` |
+| `zsh/.zshrc`           | Shell (oh-my-zsh, starship, aliases, funciones) | `~/.zshrc` |
+| `skhd/skhdrc`          | Atajos de teclado (lanzan comandos de komorebi) | `~/.skhdrc` |
+| `komorebi/`            | Config de komorebi-for-mac | `~/.config/komorebi/` |
+| `ghostty/`             | Terminal Ghostty | `~/Library/Application Support/com.mitchellh.ghostty/` |
+| `vscode/settings.json` | Ajustes de VS Code (extensiones → Brewfile) | `~/Library/Application Support/Code/User/` |
+| `git/`                 | Plantilla de `.gitconfig` + script de setup | `~/.gitconfig` |
+| `macos-defaults.sh`    | `defaults write` de macOS | — |
+| `gitch.sh`             | Utilidad propia de Git | — |
+| `legacy/`              | Setup antiguo (yabai, aerospace, sketchybar, borders) — ver abajo | — |
 
-    ```sh
-    ./install.sh <username> <email>
-    ```
+## komorebi (gestor de ventanas)
 
-## Script Description
+- `komorebi/komorebi.json` — config principal (layouts, paddings, `ignore_rules`).
+- `komorebi/applications.json` — reglas por aplicación.
+- `komorebi/komorebi.bar.json` — la barra (`komorebic start --bar`).
+- Los atajos viven en `skhd/skhdrc` (skhd lee `~/.skhdrc`).
 
-The `install.sh` script performs the following actions:
+> Nota es_ES: las reglas para ignorar ventanas del sistema usan el **nombre
+> localizado** (p. ej. `Centro de control`, `Ajustes del Sistema`). Si cambias el
+> idioma de macOS hay que actualizar esos nombres en `ignore_rules`.
 
-1. Checks that two parameters (username and email) are provided.
-2. Installs Homebrew if it is not already installed.
-3. Executes the `macConfig.sh` script to configure the macOS system.
-4. Configures Git using the `setup_gitconfig.sh` script with the provided username and email.
-5. Installs various tools and applications using Homebrew.
-6. Installs code editors and development tools.
-7. Sets up the environment by installing `yabai`, `borders`, and `sketchybar`, and copies the corresponding configuration files to the home directory.
+## legacy/
 
-## Tools Installed
+Setup anterior, ya no en uso (antes usaba yabai + sketchybar + borders):
 
-- displaylink
-- bitwarden
-- warp
-- postman
-- chatgpt
-- discord
-- nordvpn
-- vlc
-- notion
-- orbstack
-- onedrive
-- pgadmin4
-- postgresql
-- whatsapp
+- `legacy/yabai/`, `legacy/skhdrc-yabai`, `legacy/aerospace/`, `legacy/sketchybar/`.
+- `legacy/sketchybar-system-stats/` (proyecto de terceros) está **gitignorado** por su tamaño; si revives sketchybar, recompílalo.
 
-## Code Editors
+Se conserva por si alguna vez vuelvo a ese stack.
 
-- Xcode Command Line Tools
-- Visual Studio Code
-- Rider
+## Licencia
 
-## Environment Setup
-
-- yabai
-- borders
-- sketchybar
-
-Configuration files for `yabai`, `sketchybar` and `.zshrc` are copied to the home directory.
-
-## Contributing
-
-Contributions are welcome! Open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License.
+MIT.

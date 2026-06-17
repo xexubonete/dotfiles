@@ -1,5 +1,0 @@
-/*!
-   * ISC License
-   *
-   * Copyright (c) 2018, Andrea Giammarchi, @WebReflection
-   */

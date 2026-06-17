@@ -1,4 +1,0 @@
-/**!
- * Originally written by:
- * https://github.com/sindresorhus/parse-json
- */

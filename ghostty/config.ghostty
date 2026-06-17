@@ -1,0 +1,9 @@
+font-family = "Hack Nerd Font"
+font-size = 14
+font-thicken = true
+
+window-padding-x = 10
+window-padding-y = 8
+
+background = 000000
+theme = Dark Pastel

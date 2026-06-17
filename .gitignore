@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Artefactos de compilación de herramientas vendorizadas (legacy)
+legacy/sketchybar-system-stats/
+**/target/
+
+# Copias de seguridad que crea install.sh
+*.bak.*
+
+# Config local con secretos (nunca versionar)
+.zshrc.local
+*.local

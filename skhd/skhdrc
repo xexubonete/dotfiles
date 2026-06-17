@@ -1,0 +1,70 @@
+# Focus windows
+ctrl - h                 : komorebic focus left
+ctrl - j                 : komorebic focus up
+ctrl - k                 : komorebic focus down
+ctrl - l                 : komorebic focus right
+ctrl + shift - 0x21      : komorebic cycle-focus previous # 0x21 is [
+ctrl + shift - 0x1E      : komorebic cycle-focus next # 0x1E is ]
+
+# Move windows
+ctrl + shift - h         : komorebic move left
+ctrl + shift - j         : komorebic move down
+ctrl + shift - k         : komorebic move up
+ctrl + shift - l         : komorebic move right
+ctrl + shift - return    : komorebic promote
+
+# Stack windows
+ctrl + ctrl - left       : komorebic stack left
+ctrl + ctrl - down       : komorebic stack down
+ctrl + ctrl - up         : komorebic stack up
+ctrl + ctrl - right      : komorebic stack right
+ctrl - 0x29              : komorebic unstack # 0x29 is
+ctrl - 0x21              : komorebic cycle-stack previous # 0x21 is [
+ctrl - 0x1E              : komorebic cycle-stack next # 0x1E is ]
+
+# Workspace layer
+ctrl + shift - 0x29      : komorebic toggle-workspace-layer # 0x29 is ;
+
+# Resize
+ctrl - 0x18              : komorebic resize-axis horizontal increase # 0x18 is +
+ctrl - 0x1B              : komorebic resize-axis horizontal decrease # 0x1B is -
+ctrl + shift - 0x18      : komorebic resize-axis vertical increase
+ctrl + shift - 0x1B      : komorebic resize-axis vertical decrease
+
+# Manipulate windows
+ctrl - t                 : komorebic toggle-float
+ctrl + shift - t         : komorebic toggle-workspace-float-override
+ctrl - f                 : komorebic toggle-monocle
+ctrl + shift - f         : komorebic toggle-monocle
+
+# Window manager options
+ctrl + shift - r         : komorebic retile
+ctrl - p                 : komorebic toggle-pause
+ctrl - 0                 : komorebic toggle-window-container-behaviour
+
+# Layouts
+ctrl - x                 : komorebic flip-layout horizontal
+ctrl - y                 : komorebic flip-layout vertical
+ctrl + shift - x         : komorebic session-float-rule
+
+# Workspaces
+ctrl - 1                 : komorebic focus-workspace 0
+ctrl - 2                 : komorebic focus-workspace 1
+ctrl - 3                 : komorebic focus-workspace 2
+ctrl - 4                 : komorebic focus-workspace 3
+ctrl - 5                 : komorebic focus-workspace 4
+ctrl - 6                 : komorebic focus-workspace 5
+ctrl - 7                 : komorebic focus-workspace 6
+ctrl - 8                 : komorebic focus-workspace 7
+ctrl - 9                 : komorebic focus-workspace 8
+
+# Move windows across workspaces
+ctrl + shift - 1         : komorebic move-to-workspace 0
+ctrl + shift - 2         : komorebic move-to-workspace 1
+ctrl + shift - 3         : komorebic move-to-workspace 2
+ctrl + shift - 4         : komorebic move-to-workspace 3
+ctrl + shift - 5         : komorebic move-to-workspace 4
+ctrl + shift - 6         : komorebic move-to-workspace 5
+ctrl + shift - 7         : komorebic move-to-workspace 6
+ctrl + shift - 8         : komorebic move-to-workspace 7
+ctrl + shift - 9         : komorebic move-to-workspace 8
