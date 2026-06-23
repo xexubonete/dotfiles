@@ -241,7 +241,8 @@ reset_komorebic() {
     sleep 1
     
     echo "Starting komorebi..."
-    komorebi -c ~/.config/komorebi/komorebi.json &>/dev/null &
+    # Binario de mi fork con ajustes personales (ver dotfiles/install.sh)
+    ~/dev/komorebi-for-mac/target/release/komorebi -c ~/.config/komorebi/komorebi.json &>/dev/null &
     disown
     sleep 2
     

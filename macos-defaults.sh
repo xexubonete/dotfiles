@@ -8,6 +8,7 @@ defaults write -g AppleInterfaceStyle -string "Dark"                  # Modo osc
 defaults write -g AppleShowAllExtensions -bool true                   # Mostrar todas las extensiones de archivo
 defaults write -g ApplePersistence -bool false                        # No restaurar ventanas al reabrir apps
 defaults write -g com.apple.swipescrolldirection -bool false          # Dirección de scroll NO natural (tradicional)
+defaults write -g AppleFocusFollowsMouse -bool true                   # El foco sigue al ratón (como yabai), sin elevar la ventana
 
 ### Dock
 defaults write com.apple.dock tilesize -int 16                        # Tamaño de iconos (tu valor real)

@@ -3,15 +3,20 @@
   "app_specific_configuration_path": "$HOME/.config/komorebi/applications.json",
   "cross_monitor_move_behaviour": "Swap",
   "default_workspace_padding": 0,
-  "default_container_padding": 0,
-  "border": false,
-  "border_width": 0,
-  "border_offset": 0,
+  "default_container_padding": 2,
+  "border": true,
+  "border_width": 2,
+  "border_offset": -7,
+  "border_radius": 6,
   "border_colours": {
-    "single": "#fff700",
-    "stack": "#fff700",
-    "monocle": "#fff700",
-    "unfocused": "#444444"
+    "single": "#4DA6FF",
+    "stack": "#4DA6FF",
+    "monocle": "#4DA6FF",
+    "floating": "#4DA6FF",
+    "unfocused": "#1E1E1E"
+  },
+  "animation": {
+    "enabled": false
   },
   "floating_window_aspect_ratio": "Widescreen",
   "floating_layer_behaviour": "Float",

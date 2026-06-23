@@ -32,8 +32,12 @@ brew "sqlcmd"
 brew "starship"
 # UNIX shell (command interpreter)
 brew "zsh"
-# Gestor de ventanas en mosaico para macOS (komorebi-for-mac)
+# Gestor de ventanas en mosaico para macOS (komorebi-for-mac).
+# Aporta el CLI 'komorebic' en el PATH (lo usan skhd y rset). El binario
+# 'komorebi' que se ejecuta es mi build personal con ajustes (ver install.sh).
 brew "lgug2z/tap/komorebi-for-mac"
+# Toolchain de Rust (cargo) para compilar mi fork de komorebi-for-mac
+brew "rust"
 # Daemon de atajos de teclado (lanza los comandos komorebic)
 brew "asmvik/formulae/skhd"
 # Bordes de la ventana activa (JankyBorders)

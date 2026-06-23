@@ -57,10 +57,22 @@ link vscode/settings.json        "$HOME/Library/Application Support/Code/User/se
 echo "⚙️  Ajustes de macOS (Dock, hot corners, energía)… (puede pedir contraseña)"
 sh "$DOTFILES/macos-defaults.sh"
 
-echo "🪟 Autostart de komorebi (LaunchAgent: arranca ahora y al iniciar sesión)…"
-# Se lanza vía launchd en tu sesión gráfica → dispara los avisos de permisos de macOS.
-# komorebi NO necesita SIP desactivado (a diferencia de yabai): deja SIP como esté.
-komorebic enable-autostart --bar 2>/dev/null || true
+echo "🦀 Compilando komorebi-for-mac (mi fork con ajustes personales)…"
+# El binario 'komorebi' que ejecuto es mi build del fork, no el de brew.
+# brew solo aporta el CLI 'komorebic' en el PATH. Lo lanzo con 'rset' (.zshrc).
+KOMOREBI_SRC="$HOME/dev/komorebi-for-mac"
+KOMOREBI_BRANCH="mac-tweaks"
+KOMOREBI_REPO="https://github.com/xexubonete/komorebi-for-mac.git"
+if [ ! -d "$KOMOREBI_SRC/.git" ]; then
+  git clone --branch "$KOMOREBI_BRANCH" "$KOMOREBI_REPO" "$KOMOREBI_SRC"
+else
+  git -C "$KOMOREBI_SRC" fetch origin "$KOMOREBI_BRANCH"
+  git -C "$KOMOREBI_SRC" checkout "$KOMOREBI_BRANCH"
+  git -C "$KOMOREBI_SRC" pull --ff-only origin "$KOMOREBI_BRANCH" || true
+fi
+( cd "$KOMOREBI_SRC" && cargo build --release )
+echo "  ✅ Binario en $KOMOREBI_SRC/target/release/komorebi"
+echo "     Arráncalo con 'rset' (definido en .zshrc). No uso autostart vía launchd."
 
 echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
 echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
