@@ -41,8 +41,27 @@
   "monitors": [
     {
       "workspaces": [
-        { "name": "1", "layout": "Grid" },
-        { "name": "2", "layout": "Grid" },
+        {
+          "name": "1",
+          "layout": "Grid",
+          "initial_workspace_rules": [
+            { "kind": "Exe", "id": "WhatsApp" },
+            { "kind": "Exe", "id": "Música" },
+            { "kind": "Exe", "id": "Music" },
+            { "kind": "Exe", "id": "Mail" },
+            { "kind": "Exe", "id": "Discord" },
+            { "kind": "Exe", "id": "Ghostty" },
+            { "kind": "Exe", "id": "Claude" }
+          ]
+        },
+        {
+          "name": "2",
+          "layout": "Grid",
+          "initial_workspace_rules": [
+            { "kind": "Exe", "id": "Brave" },
+            { "kind": "Exe", "id": "Brave Browser" }
+          ]
+        },
         { "name": "3", "layout": "Grid" },
         { "name": "4", "layout": "Grid" },
         { "name": "5", "layout": "Grid" }
