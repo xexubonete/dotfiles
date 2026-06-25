@@ -232,16 +232,16 @@ alias rkill=kill_komorebic
 
 # Reset komorebic environment
 reset_komorebic() {
+    local plist="$HOME/Library/LaunchAgents/com.lgug2z.komorebi.plist"
     echo "Stopping komorebi..."
+    launchctl unload "$plist" 2>/dev/null
     pkill -9 komorebi 2>/dev/null
     sleep 1
-    
+
     echo "Starting komorebi..."
-    # Binario de mi fork con ajustes personales (ver dotfiles/install.sh)
-    ~/dev/komorebi-for-mac/target/release/komorebi -c ~/.config/komorebi/komorebi.json &>/dev/null &
-    disown
+    launchctl load "$plist"
     sleep 2
-    
+
     if pgrep -q komorebi; then
         komorebic retile 2>/dev/null
         echo "Komorebic reset complete!"
@@ -250,3 +250,9 @@ reset_komorebic() {
     fi
 }
 alias rset=reset_komorebic
+alias kstart="$HOME/dev/dotfiles/komorebi/startup.sh"
+# Recompila komorebi y lo firma con el certificado estable (mantiene permisos).
+kbuild() {
+    ( cd "$HOME/dev/komorebi-for-mac" && cargo build --release ) \
+      && "$HOME/dev/dotfiles/komorebi/setup-codesign.sh"
+}

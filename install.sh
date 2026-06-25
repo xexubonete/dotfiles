@@ -72,7 +72,32 @@ else
 fi
 ( cd "$KOMOREBI_SRC" && cargo build --release )
 echo "  ✅ Binario en $KOMOREBI_SRC/target/release/komorebi"
-echo "     Arráncalo con 'rset' (definido en .zshrc). No uso autostart vía launchd."
+
+# Firmar con un certificado autofirmado ESTABLE. cargo firma "ad-hoc" (la firma
+# cambia en cada build) y macOS revoca Accesibilidad/Grabación de Pantalla tras
+# cada recompilación. Con firma estable, los permisos se conceden una vez y
+# persisten. Ver komorebi/setup-codesign.sh.
+sh "$DOTFILES/komorebi/setup-codesign.sh" "$KOMOREBI_SRC/target/release/komorebi"
+
+KOMOREBI_BIN="$KOMOREBI_SRC/target/release/komorebi"
+KOMOREBI_CFG="$HOME/.config/komorebi/komorebi.json"
+PLIST_DEST="$HOME/Library/LaunchAgents/com.lgug2z.komorebi.plist"
+mkdir -p "$HOME/Library/LaunchAgents"
+sed \
+  -e "s|KOMOREBI_BINARY_PLACEHOLDER|$KOMOREBI_BIN|g" \
+  -e "s|KOMOREBI_CONFIG_PLACEHOLDER|$KOMOREBI_CFG|g" \
+  "$DOTFILES/komorebi/com.lgug2z.komorebi.plist" > "$PLIST_DEST"
+launchctl unload "$PLIST_DEST" 2>/dev/null || true
+launchctl load "$PLIST_DEST"
+echo "  ✅ LaunchAgent instalado: komorebi arrancará automáticamente al iniciar sesión."
+echo "     Para restartarlo: usa 'rset'. Para parar: launchctl unload $PLIST_DEST"
+
+STARTUP_PLIST="$HOME/Library/LaunchAgents/com.xexu.startup.plist"
+sed "s|STARTUP_SCRIPT_PLACEHOLDER|$DOTFILES/komorebi/startup.sh|g" \
+  "$DOTFILES/komorebi/com.xexu.startup.plist" > "$STARTUP_PLIST"
+launchctl unload "$STARTUP_PLIST" 2>/dev/null || true
+launchctl load "$STARTUP_PLIST"
+echo "  ✅ Script de inicio: abre las apps del entorno al iniciar sesión."
 
 echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
 echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
