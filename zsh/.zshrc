@@ -206,10 +206,6 @@ eval "$(starship init zsh)"
 #HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$PATH:/Applications/Rider.app/Contents/MacOS"
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-fpath=(${ASDF_DIR}/libexec/completions $fpath)
-
 autoload -Uz compinit && compinit
 
 export NVM_DIR="$HOME/.nvm"
