@@ -49,6 +49,29 @@ ctrl - 7                 : komorebic focus-workspace 6
 ctrl - 8                 : komorebic focus-workspace 7
 ctrl - 9                 : komorebic focus-workspace 8
 
+# Cmd+Q inteligente: si la app frontal tiene varias ventanas, cierra SOLO la
+# enfocada (botón rojo de cerrar vía Accessibility); si es la última ventana,
+# sale de la app (como el Cmd+Q normal). Así Cmd+Q ya no cierra todo de golpe.
+# Debounce con mkdir (atómico): al mantener pulsado, macOS auto-repite la tecla
+# y skhd dispararía la acción muchas veces; el candado deja pasar solo una cada
+# segundo, así que una pulsación = una acción.
+cmd - q                  : g=/tmp/.komo-close-guard; if mkdir "$g" 2>/dev/null; then osascript -e 'tell application "System Events"' -e 'set p to first process whose frontmost is true' -e 'set n to count windows of p' -e 'set bid to bundle identifier of p' -e 'end tell' -e 'if n > 1 then' -e 'tell application "System Events" to tell p to click button 1 of window 1' -e 'else' -e 'tell application id bid to quit' -e 'end if'; ( sleep 1.0; rmdir "$g" ) & fi
+
+# Cerrar SIEMPRE solo la ventana enfocada (sin salir de la app aunque sea la
+# última). Alternativa a Cmd+Q para forzar cierre de ventana.
+ctrl - q                 : g=/tmp/.komo-closewin-guard; if mkdir "$g" 2>/dev/null; then osascript -e 'tell application "System Events" to tell (first process whose frontmost is true) to click button 1 of window 1'; ( sleep 1.0; rmdir "$g" ) & fi
+
+# Lanzar aplicaciones
+# Modificador cmd+ctrl: no lo usa komorebi (que solo usa ctrl y ctrl+shift) ni
+# son atajos del sistema (se evitan cmd+ctrl+F/Q/Espacio/D, que sí reserva macOS).
+cmd + ctrl - return      : open -na "Ghostty"       # nueva ventana
+cmd + ctrl - b           : open -na "Brave Browser" --args --new-window
+cmd + ctrl - w           : open -a "WhatsApp"
+cmd + ctrl - m           : open -a "Mail"
+cmd + ctrl - s           : open -a "Music"          # Música
+cmd + ctrl - i           : open -a "Discord"
+cmd + ctrl - c           : open -a "Claude"
+
 # Move windows across workspaces
 ctrl + shift - 1         : komorebic move-to-workspace 0
 ctrl + shift - 2         : komorebic move-to-workspace 1
