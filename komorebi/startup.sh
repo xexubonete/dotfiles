@@ -7,9 +7,6 @@
 # el grid sale distinto cada vez. Al reiniciar komorebi con todas las ventanas
 # ya abiertas, las enumera de una vez en orden estable (CGWindowList) → mismo
 # layout que 'rset', consistente.
-#
-# Space 1: WhatsApp, Música, Mail, Discord, Ghostty, Claude
-# Space 2: Brave
 
 apps=("WhatsApp" "Music" "Mail" "Discord" "Ghostty" "Claude" "Brave Browser")
 
@@ -33,9 +30,5 @@ done
 # Margen para que las ventanas existan en CGWindowList.
 sleep 3
 
-# Reiniciar komorebi (equivalente a 'rset') para enumeración determinista.
-plist="$HOME/Library/LaunchAgents/com.lgug2z.komorebi.plist"
-launchctl unload "$plist" 2>/dev/null
-pkill -9 komorebi 2>/dev/null
-sleep 1
-launchctl load "$plist"
+# Reiniciar komorebi (mismo camino que 'rset' y que el despertar).
+exec "${DOTFILES:-$HOME/dev/dotfiles}/komorebi/restart.sh"

@@ -234,49 +234,10 @@ alias rkill=kill_komorebic
 
 # Reset komorebic environment
 reset_komorebic() {
-    local plist="$HOME/Library/LaunchAgents/com.lgug2z.komorebi.plist"
-    local log="/tmp/komorebi.out.log"
-    local domain="gui/$(id -u)"
-
-    # Rotar el registro si ha crecido: se escribe una línea por evento de ventana
-    # y llega a varios MB en un rato. Se conserva la vuelta anterior por si hay
-    # que mirar qué pasó antes del reinicio.
-    if [ -f "$log" ] && [ "$(stat -f%z "$log")" -gt 5242880 ]; then
-        mv -f "$log" "$log.1"
-        echo "Log rotado (>5MB): $log.1"
-    fi
-
-    echo "Stopping komorebi..."
-    # bootout/bootstrap en lugar de unload/load, que están obsoletos desde macOS 10.11.
-    launchctl bootout "$domain" "$plist" 2>/dev/null
-    pkill -9 -x komorebi 2>/dev/null
-
-    # Esperar a que muera de verdad en vez de dormir a ciegas: si el proceso
-    # sigue vivo cuando launchd arranca el siguiente, el nuevo aborta al detectar
-    # que ya hay una instancia.
-    local i=0
-    while pgrep -qx komorebi && [ $i -lt 50 ]; do
-        sleep 0.1
-        i=$((i + 1))
-    done
-
-    echo "Starting komorebi..."
-    launchctl bootstrap "$domain" "$plist" 2>/dev/null
-
-    # Y esperar a que esté listo, no un tiempo fijo: arrancar tarda lo que tarde
-    # según cuántas ventanas haya que enumerar.
-    i=0
-    while ! pgrep -qx komorebi && [ $i -lt 100 ]; do
-        sleep 0.1
-        i=$((i + 1))
-    done
-
-    if pgrep -qx komorebi; then
-        komorebic retile 2>/dev/null
-        echo "Komorebic reset complete!"
-    else
-        echo "Error: komorebi failed to start"
-    fi
+    # El reinicio vive en un script, no aquí: lo comparten 'rset', el arranque de
+    # sesión y el despertar del equipo. Cuando cada uno tenía su copia, sólo esta
+    # se mantuvo al día.
+    "$HOME/dev/dotfiles/komorebi/restart.sh"
 }
 alias rset=reset_komorebic
 alias kstart="$HOME/dev/dotfiles/komorebi/startup.sh"
