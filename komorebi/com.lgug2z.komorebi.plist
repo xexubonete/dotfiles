@@ -20,6 +20,11 @@
                 <string>KOMOREBI_BINARY_PLACEHOLDER</string>
                 <string>--config</string>
                 <string>KOMOREBI_CONFIG_PLACEHOLDER</string>
+                <!-- warn, not the default info: at info komorebi writes a line for every
+                     window event, from the same thread that handles them, so the disk
+                     write lands on the path the user feels. Problems still show up. -->
+                <string>--log-level</string>
+                <string>warn</string>
         </array>
         <key>StandardOutPath</key>
         <string>/tmp/komorebi.out.log</string>
