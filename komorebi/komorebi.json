@@ -8,13 +8,17 @@
   "border": true,
   "border_width": 2,
   "border_offset": -7,
-  "border_radius": 6,
+  "border_radius": 18,
+  "border_flash_style": "width",
+  "border_flash_factor": 6.0,
+  "border_flash_duration_ms": 140,
+  "border_flash_easing": "easeOut",
   "border_colours": {
-    "single": "#4DA6FF",
-    "stack": "#4DA6FF",
-    "monocle": "#4DA6FF",
-    "floating": "#4DA6FF",
-    "unfocused": "#1E1E1E"
+    "single": "#FFBF00",
+    "stack": "#FFBF00",
+    "monocle": "#FFBF00",
+    "floating": "#FFBF00",
+    "unfocused": "#2A2E33"
   },
   "animation": {
     "enabled": false
