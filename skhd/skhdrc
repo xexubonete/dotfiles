@@ -1,20 +1,20 @@
-# Focus windows
-ctrl - j                 : komorebic focus left
+# Focus windows (vim: h/j/k/l = izquierda/abajo/arriba/derecha)
+ctrl - h                 : komorebic focus left
+ctrl - j                 : komorebic focus down
 ctrl - k                 : komorebic focus up
-ctrl - l                 : komorebic focus down
-ctrl - 0x29              : komorebic focus right # 0x29 = ñ
+ctrl - l                 : komorebic focus right
 ctrl + shift - 0x21      : komorebic cycle-focus previous # 0x21 is [
 ctrl + shift - 0x1E      : komorebic cycle-focus next # 0x1E is ]
 
-# Move windows
-ctrl + shift - j         : komorebic move left
+# Move windows (vim: h/j/k/l = izquierda/abajo/arriba/derecha)
+ctrl + shift - h         : komorebic move left
+ctrl + shift - j         : komorebic move down
 ctrl + shift - k         : komorebic move up
-ctrl + shift - l         : komorebic move down
-ctrl + shift - 0x29      : komorebic move right # 0x29 = ñ
+ctrl + shift - l         : komorebic move right
 ctrl + shift - return    : komorebic promote
 
-# Workspace layer
-ctrl + shift - h         : komorebic toggle-workspace-layer
+# Workspace layer (movido de ctrl+shift-h a ctrl+shift-ñ: h ahora es "mover izquierda")
+ctrl + shift - 0x29      : komorebic toggle-workspace-layer # 0x29 = ñ
 
 # Resize
 ctrl - 0x18              : komorebic resize-axis horizontal increase # 0x18 is +
