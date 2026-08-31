@@ -47,6 +47,10 @@ link zsh/.zshrc                  "$HOME/.zshrc"
 # atajos ('zsh -c'). Ahí se pone ~/.local/bin delante del PATH para que los
 # atajos usen mi komorebic, no otro.
 link zsh/.zshenv                 "$HOME/.zshenv"
+# sleepwatcher ejecuta ~/.wakeup al despertar el equipo. Antes era un fichero
+# suelto en el home, fuera de dotfiles, y llamaba a un komorebic de brew que ya
+# no existe: llevaba meses sin hacer nada.
+link komorebi/wakeup.sh          "$HOME/.wakeup"
 # Atajos de teclado (skhd lee ~/.skhdrc; lanza los comandos de komorebi)
 link skhd/skhdrc                 "$HOME/.skhdrc"
 # Gestor de ventanas komorebi-for-mac
