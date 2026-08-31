@@ -32,10 +32,10 @@ brew "sqlcmd"
 brew "starship"
 # UNIX shell (command interpreter)
 brew "zsh"
-# Gestor de ventanas en mosaico para macOS (komorebi-for-mac).
-# Aporta el CLI 'komorebic' en el PATH (lo usan skhd y rset). El binario
-# 'komorebi' que se ejecuta es mi build personal con ajustes (ver install.sh).
-brew "lgug2z/tap/komorebi-for-mac"
+# Gestor de ventanas en mosaico (komorebi-for-mac): NO se instala por brew.
+# Uso mi propio fork (rama mac-tweaks), que install.sh compila y enlaza en
+# ~/.local/bin. Tener además la fórmula dejaba un 'komorebic' de otro commit
+# delante en el PATH, hablándole al daemon con un CLI desfasado.
 # Toolchain de Rust (cargo) para compilar mi fork de komorebi-for-mac
 brew "rust"
 # Daemon de atajos de teclado (lanza los comandos komorebic)

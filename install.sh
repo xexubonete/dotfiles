@@ -43,6 +43,10 @@ link() {
 echo "🔗 Enlazando configuraciones…"
 # Shell
 link zsh/.zshrc                  "$HOME/.zshrc"
+# .zshenv lo leen TAMBIÉN los shells no interactivos, que es como skhd lanza los
+# atajos ('zsh -c'). Ahí se pone ~/.local/bin delante del PATH para que los
+# atajos usen mi komorebic, no otro.
+link zsh/.zshenv                 "$HOME/.zshenv"
 # Atajos de teclado (skhd lee ~/.skhdrc; lanza los comandos de komorebi)
 link skhd/skhdrc                 "$HOME/.skhdrc"
 # Gestor de ventanas komorebi-for-mac
@@ -58,8 +62,9 @@ echo "⚙️  Ajustes de macOS (Dock, hot corners, energía)… (puede pedir con
 sh "$DOTFILES/macos-defaults.sh"
 
 echo "🦀 Compilando komorebi-for-mac (mi fork con ajustes personales)…"
-# El binario 'komorebi' que ejecuto es mi build del fork, no el de brew.
-# brew solo aporta el CLI 'komorebic' en el PATH. Lo lanzo con 'rset' (.zshrc).
+# komorebi NO se instala por brew: uso mi build del fork, y de él salen los TRES
+# binarios (komorebi, komorebic, komorebi-bar). Así el daemon y el CLI van
+# siempre del mismo commit. Lo lanzo con 'rset' (.zshrc).
 KOMOREBI_SRC="$HOME/dev/komorebi-for-mac"
 KOMOREBI_BRANCH="mac-tweaks"
 KOMOREBI_REPO="https://github.com/xexubonete/komorebi-for-mac.git"
@@ -78,6 +83,15 @@ echo "  ✅ Binario en $KOMOREBI_SRC/target/release/komorebi"
 # cada recompilación. Con firma estable, los permisos se conceden una vez y
 # persisten. Ver komorebi/setup-codesign.sh.
 sh "$DOTFILES/komorebi/setup-codesign.sh" "$KOMOREBI_SRC/target/release/komorebi"
+
+# Enlazar los binarios del fork en ~/.local/bin, que .zshenv pone al principio
+# del PATH. Sin esto, 'komorebic' podría resolverse a otra copia del sistema y
+# acabaríamos pilotando el daemon con un CLI de otro commit.
+mkdir -p "$HOME/.local/bin"
+for _bin in komorebi komorebic komorebi-bar; do
+  ln -sfn "$KOMOREBI_SRC/target/release/$_bin" "$HOME/.local/bin/$_bin"
+  echo "  $HOME/.local/bin/$_bin → $KOMOREBI_SRC/target/release/$_bin"
+done
 
 KOMOREBI_BIN="$KOMOREBI_SRC/target/release/komorebi"
 KOMOREBI_CFG="$HOME/.config/komorebi/komorebi.json"
