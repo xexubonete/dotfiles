@@ -117,6 +117,16 @@ launchctl unload "$STARTUP_PLIST" 2>/dev/null || true
 launchctl load "$STARTUP_PLIST"
 echo "  ✅ Script de inicio: abre las apps del entorno al iniciar sesión."
 
+# Vigilante del bloqueo de sesión. Cubre el salvapantallas, donde no hay sueño del que
+# despertar y sleepwatcher no avisa de nada: la sesión se bloquea con la pantalla
+# encendida y komorebi se queda sin recolocar hasta que alguien lo reinicie.
+LOCKWATCH_PLIST="$HOME/Library/LaunchAgents/com.xexu.lockwatch.plist"
+sed "s|DOTFILES_PLACEHOLDER|$DOTFILES|g" \
+  "$DOTFILES/komorebi/com.xexu.lockwatch.plist" > "$LOCKWATCH_PLIST"
+launchctl bootout "gui/$(id -u)" "$LOCKWATCH_PLIST" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$LOCKWATCH_PLIST"
+echo "  ✅ Vigilante de bloqueo: recoloca las ventanas al desbloquear la sesión."
+
 echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
 echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
 open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"  2>/dev/null || true
