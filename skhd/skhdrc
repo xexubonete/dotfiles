@@ -31,7 +31,11 @@ ctrl + shift - f         : komorebic toggle-monocle
 # Window manager options
 ctrl + shift - r         : komorebic retile
 ctrl - p                 : komorebic toggle-pause
-ctrl - 0                 : komorebic toggle-window-container-behaviour
+# ctrl - 0 alternaba entre "una celda por ventana" y "apilar en la celda enfocada".
+# Quitado: está pegado al ctrl - 9 de cambiar de escritorio, no avisa de nada al
+# cambiar, y una pulsación de más dejaba a komorebi apilando todo lo que se abriera.
+# El modo se fija ahora en komorebi.json (window_container_behaviour: Create).
+# ctrl - 0                 : komorebic toggle-window-container-behaviour
 
 # Layouts
 ctrl - x                 : komorebic flip-layout horizontal
