@@ -178,3 +178,7 @@ vscode "twxs.cmake"
 vscode "wayou.vscode-todo-highlight"
 vscode "yoavbls.pretty-ts-errors"
 vscode "zignd.html-css-class-completion"
+
+# jq lo usa el hook de git de Claude. macOS lo trae desde Sequoia, pero un Mac más
+# antiguo no, y sin él el candado falla en silencio.
+brew "jq"

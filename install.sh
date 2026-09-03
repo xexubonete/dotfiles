@@ -61,6 +61,23 @@ link komorebi/komorebi.bar.json  "$HOME/.config/komorebi/komorebi.bar.json"
 link ghostty/config.ghostty      "$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
 # VS Code (los ajustes; las extensiones ya se instalan con brew bundle)
 link vscode/settings.json        "$HOME/Library/Application Support/Code/User/settings.json"
+# Ajustes de Claude Code: permisos y los hooks que impiden que Claude haga commit,
+# push, merge o apruebe PRs por su cuenta. El candado vive aparte en claude/, para
+# poder quitarlo y devolverlo sin riesgo de perderlo (claude/git-guard.sh).
+mkdir -p "$HOME/.claude"
+# El candado y su interruptor sí van enlazados: son fijos.
+link claude/full-git-guard.hooks.json "$HOME/.claude/full-git-guard.hooks.json"
+link claude/git-guard.sh         "$HOME/.claude/git-guard.sh"
+# settings.json NO se enlaza, se copia si no existe. Claude Code escribe en él, y
+# quitar el candado para dejarle subir algo dejaría el repo modificado -- con el
+# riesgo de commitear un settings.json sin candado y que un Mac nuevo naciera
+# desprotegido. El repo guarda el estado inicial correcto; la máquina, el del momento.
+if [ ! -f "$HOME/.claude/settings.json" ]; then
+  cp "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
+  echo "  ✅ Ajustes de Claude Code instalados (con el candado de git puesto)."
+else
+  echo "  ℹ️  ~/.claude/settings.json ya existe, no se toca. Compáralo con claude/settings.json."
+fi
 
 echo "⚙️  Ajustes de macOS (Dock, hot corners, energía)… (puede pedir contraseña)"
 sh "$DOTFILES/macos-defaults.sh"
@@ -126,6 +143,24 @@ sed "s|DOTFILES_PLACEHOLDER|$DOTFILES|g" \
 launchctl bootout "gui/$(id -u)" "$LOCKWATCH_PLIST" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$LOCKWATCH_PLIST"
 echo "  ✅ Vigilante de bloqueo: recoloca las ventanas al desbloquear la sesión."
+
+# sleepwatcher, que ejecuta ~/.wakeup al despertar el equipo y al despertar la pantalla.
+# Faltaba: el binario venía en el Brewfile pero nadie instalaba su agente, así que en un
+# Mac nuevo el entorno no se recolocaba al abrir la tapa y no había forma de saber por qué.
+SLEEPWATCHER_PLIST="$HOME/Library/LaunchAgents/com.user.sleepwatcher.plist"
+sed "s|DOTFILES_HOME|$HOME|g" \
+  "$DOTFILES/komorebi/com.user.sleepwatcher.plist" > "$SLEEPWATCHER_PLIST"
+launchctl bootout "gui/$(id -u)" "$SLEEPWATCHER_PLIST" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$SLEEPWATCHER_PLIST"
+echo "  ✅ sleepwatcher: recoloca las ventanas al despertar el equipo."
+
+# Un sitio para lo que no debe viajar en un repo público.
+if [ ! -f "$HOME/.zshrc.local" ]; then
+  printf '%s\n' \
+    '# Credenciales y ajustes de esta máquina. NO va a dotfiles: el repo es público.' \
+    > "$HOME/.zshrc.local"
+  echo "  ✅ Creado ~/.zshrc.local (vacío) para credenciales de trabajo."
+fi
 
 echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
 echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
