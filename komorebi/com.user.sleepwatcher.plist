@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.sleepwatcher</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/sbin/sleepwatcher</string>
+        <string>-w</string>
+        <string>DOTFILES_HOME/.wakeup</string>
+        <!-- Despertar de PANTALLA, no del sistema: es lo que ocurre cuando el Mac se
+             bloquea por el salvapantallas sin llegar a dormirse. Sin esto, komorebi se
+             quedaba sin recolocar en ese caso. Mismo script: ya espera al desbloqueo y
+             descarta el aviso duplicado cuando llegan los dos. -->
+        <string>-W</string>
+        <string>DOTFILES_HOME/.wakeup</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/sleepwatcher.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/sleepwatcher.err.log</string>
+</dict>
+</plist>

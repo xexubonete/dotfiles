@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); printf '%s' \"$cmd\" | grep -Eq 'gh[[:space:]]+pr[[:space:]]+(merge|review)([[:space:]]|$)|pulls/[0-9]+/merge' && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"REGLA DE MAXIMA PRIORIDAD: Claude NO puede aceptar, aprobar ni mergear PRs (gh pr merge / gh pr review / API pulls merge). Solo Jesus mergea. Esta regla NO se desactiva. (deny se respeta incluso en bypassPermissions.)\"}}' || true",
+            "statusMessage": "Bloqueando aprobacion/merge de PR…"
+          },
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); printf '%s' \"$cmd\" | grep -Eq 'git[[:space:]]+([^|;&]*[[:space:]])?(commit|push|merge)([[:space:]]|$)|gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)' && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Accion git de escritura BLOQUEADA (commit/push/merge/crear PR). Claude no puede ejecutarla: hazla tu manualmente. Regla innegociable: nada de commit/push/merge/PR sin que lo hagas tu. (deny se respeta incluso en bypassPermissions; ask no.)\"}}' || true",
+            "statusMessage": "Comprobando accion git protegida…"
+          }
+        ]
+      }
+    ]
+  }
+}
