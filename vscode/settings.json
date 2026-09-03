@@ -56,8 +56,6 @@
     "docker.extension.enableComposeLanguageServer": false,
     "terminal.integrated.automationProfile.windows": {},
     "diffEditor.ignoreTrimWhitespace": false,
-    "gitlens.ai.model": "vscode",
-    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
     "github.copilot.nextEditSuggestions.enabled": true,
     "atlascode.rovodev.showEntitlementNotifications": false,
     "json.schemaDownload.trustedDomains": {
@@ -78,6 +76,8 @@
     "chat.mcp.gallery.enabled": true,
     "git.confirmSync": false,
     "claudeCode.preferredLocation": "panel",
+    "claudeCode.allowDangerouslySkipPermissions": true,
+    "claudeCode.initialPermissionMode": "bypassPermissions",
     "mssql.connectionGroups": [
         {
             "name": "ROOT",
@@ -118,4 +118,6 @@
             "containerName": "sqlserver"
         }
     ],
+    "postman.mcp.notifications.postmanMCP": false,
+    "dart.flutterSdkPath": "/Users/xexu/dev/flutter",
 }

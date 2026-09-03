@@ -7,14 +7,15 @@ export ZSH="$HOME/.oh-my-zsh"
 ### NuGet Azure Artifacts Credential Provider
 export NUGET_CREDENTIALPROVIDER_MSAL_ENABLED=true
 
-### Variables de entorno de trabajo — NO se versionan (secretos / URLs internas).
-### Define las tuyas en un archivo local (gitignorado), p. ej. ~/.zshrc.local
-[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
-
-### .NET
+### Environment variables
+export Nibw_Username=
 export DOTNET_ENVIRONMENT=
 export DOTNET_ROOT=/usr/local/share/dotnet
 export PATH="/usr/local/share/dotnet:$PATH"
+
+## Product Api
+
+## Finance Api
 
 
 # Set name of the theme to load --- if set to "random", it will
@@ -246,3 +247,86 @@ kbuild() {
     ( cd "$HOME/dev/komorebi-for-mac" && cargo build --release ) \
       && "$HOME/dev/dotfiles/komorebi/setup-codesign.sh"
 }
+
+
+
+# Ajustes del borde de komorebi. Escriben la configuración y reinician el entorno
+# con `rset`, que es lo único que aplica de verdad los cambios del binario.
+#   radio 18      ← redondeo de las esquinas
+_komorebi_set() {
+    local key="$1" value="$2" quoted="$3"
+    local cfg="$HOME/dev/dotfiles/komorebi/komorebi.json"
+
+    if [ -z "$value" ]; then
+        grep "\"$key\"" "$cfg"
+        return
+    fi
+
+    if [ "$quoted" = "yes" ]; then
+        sed -i '' "s/\"$key\": \"[a-z]*\"/\"$key\": \"$value\"/" "$cfg"
+    else
+        sed -i '' "s/\"$key\": [0-9]*/\"$key\": $value/" "$cfg"
+    fi
+
+    if ! python3 -c "import json,sys;json.load(open('$cfg'))" 2>/dev/null; then
+        echo "Error: la configuración ha quedado inválida, no reinicio"
+        return 1
+    fi
+
+    echo "$key = $value"
+    reset_komorebic
+}
+
+radio() { _komorebi_set border_radius "$1" no }
+
+
+
+# Diseños del borde. Todos usan la animación de grosor, que es la única que se ve,
+# y color blanco; lo que cambia es cuánto se abre, cuánto dura y el grosor base.
+#   diseno            los lista
+#   diseno latigazo   lo aplica y reinicia
+diseno() {
+    local cfg="$HOME/dev/dotfiles/komorebi/komorebi.json"
+    local factor dur easing width
+    local color="#FFFFFF"
+
+    case "$1" in
+        #        abre  dura  frena     grosor   color
+        seco)     factor=3.5; dur=220; easing=easeOut; width=3 ;;
+        latigazo) factor=6.0; dur=140; easing=easeOut; width=2; color="#FFBF00" ;;
+        chispa)   factor=9.0; dur=110; easing=easeOut; width=1 ;;
+        oleada)   factor=4.0; dur=360; easing=easeOut; width=3 ;;
+        *)
+            echo "Diseños (animación de grosor):"
+            echo "  seco      x3.5 · 220ms · grosor 3  — el equilibrado"
+            echo "  latigazo  x6   · 140ms · grosor 2  — más violento y corto, en ámbar"
+            echo "  chispa    x9   · 110ms · grosor 1  — trazo mínimo, estalla y desaparece"
+            echo "  oleada    x4   · 360ms · grosor 3  — amplio, se retira despacio"
+            echo
+            grep -E '"border_flash_(factor|duration_ms)"|"border_width"|"single"' "$cfg"
+            return
+            ;;
+    esac
+
+    sed -i '' "s/\"border_flash_style\": \"[a-z]*\"/\"border_flash_style\": \"width\"/" "$cfg"
+    sed -i '' "s/\"border_flash_factor\": [0-9.]*/\"border_flash_factor\": $factor/" "$cfg"
+    sed -i '' "s/\"border_flash_duration_ms\": [0-9]*/\"border_flash_duration_ms\": $dur/" "$cfg"
+    sed -i '' "s/\"border_flash_easing\": \"[a-zA-Z]*\"/\"border_flash_easing\": \"$easing\"/" "$cfg"
+    sed -i '' "s/\"border_width\": [0-9]*/\"border_width\": $width/" "$cfg"
+    for k in single stack monocle floating; do
+        sed -i '' "s/\"$k\": \"#[0-9A-Fa-f]*\"/\"$k\": \"$color\"/" "$cfg"
+    done
+
+    if ! python3 -c "import json;json.load(open('$cfg'))" 2>/dev/null; then
+        echo "Error: configuración inválida, no reinicio"
+        return 1
+    fi
+
+    echo "diseño: $1  (x$factor · ${dur}ms · grosor $width · $color)"
+    reset_komorebic
+}
+
+# Cosas de esta máquina que no van al repo: credenciales de trabajo y cualquier ajuste
+# local. El repo es público, y un fichero de plantillas vacías es una trampa esperando a
+# que alguien rellene una. Si no existe, no pasa nada.
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
