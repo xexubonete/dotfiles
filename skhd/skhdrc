@@ -49,9 +49,6 @@ ctrl - 3                 : komorebic focus-workspace 2
 ctrl - 4                 : komorebic focus-workspace 3
 ctrl - 5                 : komorebic focus-workspace 4
 ctrl - 6                 : komorebic focus-workspace 5
-ctrl - 7                 : komorebic focus-workspace 6
-ctrl - 8                 : komorebic focus-workspace 7
-ctrl - 9                 : komorebic focus-workspace 8
 
 # Cmd+Q inteligente: si la app frontal tiene varias ventanas, cierra SOLO la
 # enfocada (botón rojo de cerrar vía Accessibility); si es la última ventana,
@@ -76,6 +73,10 @@ cmd + ctrl - s           : open -a "Music"          # Música
 cmd + ctrl - i           : open -a "Discord"
 cmd + ctrl - c           : open -a "Claude"
 
+# Seis escritorios, no nueve: los del 7 al 9 no estaban en komorebi.json, así que
+# komorebi los creaba sobre la marcha con su layout por defecto (BSP) en vez del
+# Grid configurado, y ahí acababan expulsadas las ventanas que no caben en columnas
+# estrechas. Seis cubren de sobra y no hay ninguno sin configurar.
 # Move windows across workspaces
 ctrl + shift - 1         : komorebic move-to-workspace 0
 ctrl + shift - 2         : komorebic move-to-workspace 1
@@ -83,6 +84,3 @@ ctrl + shift - 3         : komorebic move-to-workspace 2
 ctrl + shift - 4         : komorebic move-to-workspace 3
 ctrl + shift - 5         : komorebic move-to-workspace 4
 ctrl + shift - 6         : komorebic move-to-workspace 5
-ctrl + shift - 7         : komorebic move-to-workspace 6
-ctrl + shift - 8         : komorebic move-to-workspace 7
-ctrl + shift - 9         : komorebic move-to-workspace 8

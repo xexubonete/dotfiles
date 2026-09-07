@@ -6,6 +6,7 @@
   "default_container_padding": 2,
   "global_work_area_offset": { "left": 0, "top": -2, "right": 0, "bottom": -2 },
   "window_container_behaviour": "Create",
+  "mouse_follows_focus": false,
   "border": true,
   "border_width": 1,
   "border_offset": -7,
@@ -44,6 +45,7 @@
   ],
   "floating_applications": [],
   "manage_rules": [],
+  "titleless_applications": ["Fotos", "Photos"],
   "monitors": [
     {
       "workspaces": [
@@ -51,7 +53,8 @@
         { "name": "2", "layout": "Grid" },
         { "name": "3", "layout": "Grid" },
         { "name": "4", "layout": "Grid" },
-        { "name": "5", "layout": "Grid" }
+        { "name": "5", "layout": "Grid" },
+        { "name": "6", "layout": "Grid" }
       ]
     }
   ]
