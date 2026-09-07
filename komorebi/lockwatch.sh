@@ -44,9 +44,7 @@ while true; do
         # Un margen corto mientras macOS termina de recomponer la pantalla.
         sleep 0.4
 
-        if [ -f "$BACKUP" ]; then
-            cp -f "$BACKUP" "$SESSION"
-        fi
+        # La copia la devuelve wakeup.sh, y sólo si decide que hay que reiniciar.
 
         # Por wakeup.sh, no directo: ahí está el descarte del aviso duplicado, para
         # cuando un mismo despertar llega también por sleepwatcher.

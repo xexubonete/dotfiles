@@ -14,6 +14,8 @@ export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
 
 DOTFILES="${DOTFILES:-$HOME/dev/dotfiles}"
 STAMP="/tmp/komorebi-wake.stamp"
+SESSION="$HOME/Library/Application Support/komorebi/komorebi.session.json"
+BACKUP="$HOME/Library/Application Support/komorebi/komorebi.session.unlocked.json"
 
 # Un mismo despertar llega dos veces: sleepwatcher avisa por la pantalla (-W) y por
 # el sistema (-w), y cerrar la tapa dispara ambos. Reiniciar komorebi dos veces
@@ -44,6 +46,40 @@ done
 # por precaución y sin medir: komorebi tarda ~1s en enumerar las ventanas, así que
 # esa precaución era la mitad de la espera total.
 sleep 0.4
+
+# ¿Hace falta reiniciar, o komorebi ha salido intacto?
+#
+# Un salvapantallas de tres segundos que se quita moviendo el ratón, sin contraseña, no
+# rompe nada -- pero se veía igual que volver de una hora suspendido: komorebi se
+# reiniciaba y recomponía escritorios que ya estaban bien. Lo que distingue un caso del
+# otro no es cuánto duró, es si komorebi sigue sabiendo dónde están las ventanas.
+#
+# La copia guardada mientras estabas dentro dice cuántas había. Si komorebi todavía las
+# conoce todas, no hay nada que recomponer y el reinicio sobra.
+if [ -f "$BACKUP" ] && command -v komorebic >/dev/null 2>&1; then
+    esperadas=$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['windows']))" "$BACKUP" 2>/dev/null || echo 0)
+    conocidas=$(komorebic state 2>/dev/null | python3 -c "
+import json,sys
+try: d=json.load(sys.stdin)
+except Exception: print(-1); raise SystemExit
+n=0
+for m in d['monitors']['elements']:
+    for ws in m['workspaces']['elements']:
+        for c in (ws.get('containers') or {}).get('elements',[]):
+            n += len((c.get('windows') or {}).get('elements',[]))
+print(n)" 2>/dev/null || echo -1)
+
+    if [ "$conocidas" -ge "$esperadas" ] && [ "$esperadas" -gt 0 ]; then
+        echo "komorebi conserva $conocidas de $esperadas ventanas: no hace falta reiniciar"
+        touch "$STAMP"
+        exit 0
+    fi
+
+    echo "komorebi conoce $conocidas de $esperadas ventanas: reiniciando"
+
+    # Sólo ahora: devolver la copia buena antes de que el proceso nuevo la lea.
+    cp -f "$BACKUP" "$SESSION"
+fi
 
 touch "$STAMP"
 
