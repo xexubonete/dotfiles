@@ -18,7 +18,7 @@
   "border_colours": {
     "single": "#FFFFFF",
     "stack": "#FFFFFF",
-    "monocle": "#FFFFFF",
+    "monocle": "#30D158",
     "floating": "#FFFFFF",
     "unfocused": "#2A2E33"
   },
