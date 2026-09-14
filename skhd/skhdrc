@@ -94,3 +94,14 @@ ctrl + shift - 2         : komorebic move-to-workspace 2
 ctrl + shift - 3         : komorebic move-to-workspace 3
 ctrl + shift - 4         : komorebic move-to-workspace 4
 ctrl + shift - 5         : komorebic move-to-workspace 5
+
+# Sacar la pestaña del navegador a un escritorio
+# La pestaña enfocada de Brave sale a su propia ventana y se va al escritorio que
+# diga la tecla, con la misma correspondencia que arriba (º = 1, 5 = 6). Con
+# cualquier otra cosa delante, el atajo no hace nada.
+ctrl + alt - 0x0A        : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 0
+ctrl + alt - 1           : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 1
+ctrl + alt - 2           : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 2
+ctrl + alt - 3           : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 3
+ctrl + alt - 4           : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 4
+ctrl + alt - 5           : "$HOME/dev/dotfiles/komorebi/tab-to-workspace.sh" 5
