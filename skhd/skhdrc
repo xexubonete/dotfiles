@@ -30,7 +30,10 @@ ctrl + shift - f         : komorebic toggle-monocle
 
 # Window manager options
 ctrl + shift - r         : komorebic retile
-ctrl - p                 : komorebic toggle-pause
+# ctrl - p ponía komorebi en pausa. Quitado: en pausa ignora todos los comandos
+# salvo despausar, así que desaparecen los bordes y no responde ningún atajo, y
+# es una tecla que se pulsa sola -- en el terminal ctrl+p es "línea anterior".
+# Encima el aviso va a nivel info y el log corre a warn, así que no dejaba rastro.
 # ctrl - 0 alternaba entre "una celda por ventana" y "apilar en la celda enfocada".
 # Quitado: está pegado al ctrl - 9 de cambiar de escritorio, no avisa de nada al
 # cambiar, y una pulsación de más dejaba a komorebi apilando todo lo que se abriera.
