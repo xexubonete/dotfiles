@@ -46,12 +46,19 @@ ctrl - y                 : komorebic flip-layout vertical
 ctrl + shift - x         : komorebic session-float-rule
 
 # Workspaces
-ctrl - 1                 : komorebic focus-workspace 0
-ctrl - 2                 : komorebic focus-workspace 1
-ctrl - 3                 : komorebic focus-workspace 2
-ctrl - 4                 : komorebic focus-workspace 3
-ctrl - 5                 : komorebic focus-workspace 4
-ctrl - 6                 : komorebic focus-workspace 5
+# Corridos una tecla a la izquierda: el escritorio 1 cae en la tecla que hay a la
+# izquierda del 1, y el 6 en el 5. Esa tecla es la º del teclado Spanish - ISO, y
+# skhd no le da nombre, así que va por su código.
+#
+# 0x0A, no 0x32: en los teclados ISO de Apple los dos códigos van al revés de lo
+# que parece. 0x32 es la tecla pegada al shift izquierdo (la de < >), y 0x0A la
+# que está a la izquierda del 1.
+ctrl - 0x0A              : komorebic focus-workspace 0
+ctrl - 1                 : komorebic focus-workspace 1
+ctrl - 2                 : komorebic focus-workspace 2
+ctrl - 3                 : komorebic focus-workspace 3
+ctrl - 4                 : komorebic focus-workspace 4
+ctrl - 5                 : komorebic focus-workspace 5
 
 # Cmd+Q inteligente: si la app frontal tiene varias ventanas, cierra SOLO la
 # enfocada (botón rojo de cerrar vía Accessibility); si es la última ventana,
@@ -81,9 +88,9 @@ cmd + ctrl - c           : open -a "Claude"
 # Grid configurado, y ahí acababan expulsadas las ventanas que no caben en columnas
 # estrechas. Seis cubren de sobra y no hay ninguno sin configurar.
 # Move windows across workspaces
-ctrl + shift - 1         : komorebic move-to-workspace 0
-ctrl + shift - 2         : komorebic move-to-workspace 1
-ctrl + shift - 3         : komorebic move-to-workspace 2
-ctrl + shift - 4         : komorebic move-to-workspace 3
-ctrl + shift - 5         : komorebic move-to-workspace 4
-ctrl + shift - 6         : komorebic move-to-workspace 5
+ctrl + shift - 0x0A      : komorebic move-to-workspace 0
+ctrl + shift - 1         : komorebic move-to-workspace 1
+ctrl + shift - 2         : komorebic move-to-workspace 2
+ctrl + shift - 3         : komorebic move-to-workspace 3
+ctrl + shift - 4         : komorebic move-to-workspace 4
+ctrl + shift - 5         : komorebic move-to-workspace 5
