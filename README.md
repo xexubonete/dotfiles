@@ -70,6 +70,27 @@ Ahora mismo no está asignado a ninguna tecla en `skhdrc`.
 - `komorebi/com.xexu.startup.plist` — ejecuta `startup.sh`, que abre las apps del entorno (Space 1: WhatsApp, Música, Mail, Discord, Ghostty, Claude · Space 2: Brave) y, **cuando todas tienen ventana, reinicia komorebi**. Motivo: si komorebi ya está corriendo, cada ventana le llega como evento suelto en orden aleatorio y el grid sale distinto cada vez; al reiniciarlo con todo abierto las enumera de golpe (orden estable) → mismo layout que `rset`, consistente.
 - `install.sh` rellena las rutas y carga ambos con `launchctl`.
 
+**Permisos verificados (`komorebi/ensure-permissions.sh`):**
+
+Abrir el panel de Ajustes no concede nada, y el usuario puede cerrarlo sin tocar
+nada. Antes el instalador abría las dos ventanas, pedía un Enter y **daba por hecho**
+que se había hecho la parte manual: si no, la instalación terminaba anunciando un
+entorno que no estaba en pie. Ahora se verifica el **comportamiento real** y se vuelve
+a pedir las veces que haga falta:
+
+| Permiso | Cómo se comprueba |
+|---|---|
+| Accesibilidad (komorebi) | ¿sigue vivo el daemon? Sin ella sale con error al arrancar |
+| Accesibilidad (skhd) | ¿sigue vivo? skhd aborta con *"must be run with accessibility access"* |
+| Grabación de pantalla | ¿lee títulos de ventana? Es lo único que aporta ese permiso |
+
+**No se consulta la API de permisos**, y esto importa: macOS atribuye la petición al
+proceso *responsable*, que para algo lanzado desde el terminal es el terminal. El mismo
+binario contesta «Grabación de pantalla: falta» desde la shell y funciona sin problema
+bajo `launchd`. Preguntar por la API desde el instalador haría pedir en bucle un permiso
+ya concedido. (Para diagnóstico suelto, el binario acepta `--check-permissions`, pero hay
+que leerlo con esa salvedad en mente.)
+
 **Firma estable (`komorebi/setup-codesign.sh`):**
 
 `cargo` firma el binario *ad-hoc* (la firma cambia en cada build) y macOS revoca
@@ -133,7 +154,7 @@ Se conserva por si alguna vez vuelvo a ese stack.
 
 El repo deja un Mac nuevo al ~85-90%. Lo que hay que rematar a mano:
 
-- **Permisos de macOS**: `install.sh` te abre los paneles de *Accesibilidad* y *Grabación de pantalla*; solo tienes que activar **komorebi** y **skhd** (1 clic cada uno). No se pueden conceder por script en un Mac con SIP activado — y **komorebi NO necesita SIP desactivado**, así que déjalo como viene (activado, más seguro). Gracias a la firma estable (`setup-codesign.sh`), esto es de **una sola vez**: recompilar con `kbuild` ya no revoca los permisos.
+- **Permisos de macOS**: `install.sh` te lleva a los paneles de *Accesibilidad* y *Grabación de pantalla* y **comprueba que los has concedido de verdad**, insistiendo hasta que sea así (ver `komorebi/ensure-permissions.sh`). No se pueden conceder por script en un Mac con SIP activado — y **komorebi NO necesita SIP desactivado**, así que déjalo como viene (activado, más seguro). Gracias a la firma estable (`setup-codesign.sh`), esto es de **una sola vez**: recompilar con `kbuild` ya no revoca los permisos.
 - **Sesiones/cuentas de apps**: Bitwarden, Teams, NordVPN, OneDrive, Notion, etc. (re-login).
 - **Raycast** y **Rider/JetBrains**: su configuración se sincroniza por **su propia nube/cuenta**, no por este repo. Activa su sync nativo.
 - **Ajustes de macOS** no incluidos en `macos-defaults.sh` (es un set curado: apariencia, Dock, hot corners, Finder; no captura cada toggle del sistema).

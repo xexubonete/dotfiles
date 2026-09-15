@@ -114,7 +114,7 @@ for _bin in komorebi komorebic komorebi-bar; do
   echo "  $HOME/.local/bin/$_bin → $KOMOREBI_SRC/target/release/$_bin"
 done
 
-KOMOREBI_BIN="$KOMOREBI_SRC/target/release/komorebi"
+KOMOREBI_BIN"$KOMOREBI_SRC/target/release/komorebi"
 KOMOREBI_CFG="$HOME/.config/komorebi/komorebi.json"
 PLIST_DEST="$HOME/Library/LaunchAgents/com.lgug2z.komorebi.plist"
 mkdir -p "$HOME/Library/LaunchAgents"
@@ -154,6 +154,13 @@ launchctl bootout "gui/$(id -u)" "$SLEEPWATCHER_PLIST" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$SLEEPWATCHER_PLIST"
 echo "  ✅ sleepwatcher: recoloca las ventanas al despertar el equipo."
 
+# Permisos de macOS. No basta con abrir el panel: abrirlo no concede nada, y el
+# usuario puede cerrarlo sin tocar nada. Este script comprueba el COMPORTAMIENTO real
+# (¿arranca el daemon? ¿lee títulos de ventana?) y vuelve a pedirlos tantas veces como
+# haga falta. Ver komorebi/ensure-permissions.sh para por qué no se consulta la API.
+KOMOREBI_BIN="$KOMOREBI_BIN" KOMOREBIC_BIN="$KOMOREBI_SRC/target/release/komorebic" \
+  sh "$DOTFILES/komorebi/ensure-permissions.sh" || PERMISSIONS_OK=no
+
 # Un sitio para lo que no debe viajar en un repo público.
 if [ ! -f "$HOME/.zshrc.local" ]; then
   printf '%s\n' \
@@ -162,25 +169,101 @@ if [ ! -f "$HOME/.zshrc.local" ]; then
   echo "  ✅ Creado ~/.zshrc.local (vacío) para credenciales de trabajo."
 fi
 
-echo "🔐 Permisos de macOS: komorebi y skhd necesitan Accesibilidad y Grabación de pantalla."
-echo "   Abro los paneles; añade/activa 'komorebi' y 'skhd' en cada lista."
-open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"  2>/dev/null || true
-open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"  2>/dev/null || true
-if [ -t 0 ]; then printf "   Pulsa Enter cuando los hayas concedido… "; read -r _; fi
+# Git. Antes esto era un echo con instrucciones, es decir: nada. Un Mac recién
+# montado se quedaba sin identidad de git y el fallo no aparecía hasta el primer
+# commit, ya fuera de la instalación y sin relación aparente con ella.
+#
+# Solo se pregunta si falta: setup_gitconfig.sh SOBRESCRIBE ~/.gitconfig, y no se
+# pisa la configuración de alguien que ya la tiene puesta.
+git_identity_set() {
+  [ -n "$(git config --global user.name  || true)" ] &&
+  [ -n "$(git config --global user.email || true)" ]
+}
 
-echo "🔧 Git: configura tu nombre/email con"
-echo "      sh git/setup_gitconfig.sh \"Tu Nombre\" tu@email"
-
-if [ -t 0 ]; then
-  printf "🔑 ¿Iniciar sesión ahora en gh y az? [y/N] "; read -r _login
-  case "$_login" in
-    y|Y)
-      command -v gh >/dev/null 2>&1 && gh auth login || true
-      command -v az >/dev/null 2>&1 && az login   || true
-      ;;
-  esac
+if git_identity_set; then
+  echo "🔧 Git: ya configurado como $(git config --global user.name) <$(git config --global user.email)>"
+elif [ -t 0 ]; then
+  for _ in 1 2 3; do
+    printf "🔧 Git — tu nombre: "; read -r _git_name
+    printf "🔧 Git — tu email:  "; read -r _git_email
+    if [ -n "$_git_name" ] && [ -n "$_git_email" ]; then
+      sh "$DOTFILES/git/setup_gitconfig.sh" "$_git_name" "$_git_email" >/dev/null
+    fi
+    if git_identity_set; then
+      echo "  ✅ Git configurado como $(git config --global user.name) <$(git config --global user.email)>"
+      break
+    fi
+    echo "  ⚠️  Sigue sin quedar configurado: hacen falta las dos cosas, nombre y email."
+  done
+  git_identity_set || STEPS_PENDING="${STEPS_PENDING:-}
+  - Git sin identidad: sh $DOTFILES/git/setup_gitconfig.sh \"Tu Nombre\" tu@email"
+else
+  STEPS_PENDING="${STEPS_PENDING:-}
+  - Git sin identidad: sh $DOTFILES/git/setup_gitconfig.sh \"Tu Nombre\" tu@email"
 fi
 
+# Sesiones de gh y az. Lanzar el login no es haber iniciado sesión: se puede cancelar,
+# fallar el navegador o equivocarse de cuenta. Se comprueba después, y se reintenta.
+ensure_login() {
+  local tool="$1" check="$2" login="$3" attempts=3
+
+  command -v "$tool" >/dev/null 2>&1 || return 0
+
+  if eval "$check" >/dev/null 2>&1; then
+    echo "🔑 $tool: sesión ya iniciada."
+    return 0
+  fi
+
+  if [ ! -t 0 ]; then
+    STEPS_PENDING="${STEPS_PENDING:-}
+  - Sesión de $tool sin iniciar: $login"
+    return 1
+  fi
+
+  printf "🔑 ¿Iniciar sesión en %s ahora? [y/N] " "$tool"; read -r _answer
+  case "$_answer" in
+    y|Y) ;;
+    *)
+      STEPS_PENDING="${STEPS_PENDING:-}
+  - Sesión de $tool sin iniciar (la saltaste): $login"
+      return 0
+      ;;
+  esac
+
+  local i
+  for i in $(seq 1 "$attempts"); do
+    eval "$login" || true
+    if eval "$check" >/dev/null 2>&1; then
+      echo "  ✅ $tool: sesión iniciada."
+      return 0
+    fi
+    echo "  ⚠️  $tool sigue sin sesión (intento $i/$attempts)."
+  done
+
+  STEPS_PENDING="${STEPS_PENDING:-}
+  - Sesión de $tool sin iniciar: $login"
+  return 1
+}
+
+ensure_login gh "gh auth status"   "gh auth login" || true
+ensure_login az "az account show"  "az login"      || true
+
+# El resumen final sale de lo que se ha verificado, no de lo que se ha intentado.
+# Anunciar un entorno activo que no lo está manda al usuario a buscar el fallo al
+# sitio equivocado, que es justo lo que hay que evitar en un Mac recién montado.
 echo
-echo "✅ Hecho. komorebi quedará activo y arrancará solo al iniciar sesión."
+if [ "${PERMISSIONS_OK:-yes}" = yes ] && pgrep -qf "$KOMOREBI_BIN"; then
+  echo "✅ Hecho. komorebi está activo y arrancará solo al iniciar sesión."
+else
+  echo "⚠️  Hecho, PERO el entorno de ventanas NO ha quedado completo."
+  echo "   Falta algún permiso por conceder. Cuando lo tengas, lanza:"
+  echo "      sh $DOTFILES/komorebi/ensure-permissions.sh"
+  echo "   Te dirá exactamente qué falta y te llevará al panel correcto."
+fi
+
+if [ -n "${STEPS_PENDING:-}" ]; then
+  echo
+  echo "📋 Queda pendiente (nada de esto se ha podido verificar):"
+  printf '%s\n' "$STEPS_PENDING"
+fi
 echo "   (No hace falta desactivar SIP; con conceder Accesibilidad + Grabación de pantalla basta.)"
