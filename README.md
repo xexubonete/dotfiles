@@ -33,6 +33,7 @@ recompilaciones** (ver más abajo).
 | `zsh/.zshrc`           | Shell (oh-my-zsh, starship, aliases, funciones) | `~/.zshrc` |
 | `skhd/skhdrc`          | Atajos de teclado (lanzan comandos de komorebi) | `~/.skhdrc` |
 | `komorebi/`            | Config de komorebi-for-mac | `~/.config/komorebi/` |
+| `claude/`              | Ajustes de Claude Code, el candado de git y `csrm` | `~/.claude/` |
 | `ghostty/`             | Terminal Ghostty | `~/Library/Application Support/com.mitchellh.ghostty/` |
 | `vscode/settings.json` | Ajustes de VS Code (extensiones → Brewfile) | `~/Library/Application Support/Code/User/` |
 | `git/`                 | Plantilla de `.gitconfig` + script de setup | `~/.gitconfig` |
@@ -140,6 +141,43 @@ Notas de diseño:
 
 - **`cmd + q` inteligente**: macOS, por defecto, sale de la app entera (cierra todas sus ventanas). Este atajo lo redefine para que pulse el botón rojo de cerrar de la ventana frontal (vía Accessibility) cuando hay varias, y solo salga de la app cuando es la última ventana. Lleva un *debounce* (candado con `mkdir`, 1/seg) porque al **mantener pulsado** macOS auto-repite la tecla y, sin él, skhd encadenaría cierres y se cerrarían todas.
 - **Lanzadores `cmd + ctrl + …`**: se eligió `cmd+ctrl` porque komorebi solo usa `ctrl`/`ctrl+shift` y no choca con atajos del sistema (se evitan `cmd+ctrl+F/Q/Espacio/D`, reservados por macOS). Ghostty y Brave abren **ventana nueva**; el resto son apps de ventana única (enfocan si ya están abiertas).
+
+## Claude Code
+
+En `claude/` van los ajustes, el candado que impide que Claude haga `commit`, `push`,
+`merge` o apruebe PRs por su cuenta (`git-guard.sh` lo pone y lo quita), y una utilidad:
+
+### `csrm` — borrar conversaciones
+
+Claude Code **no trae forma de borrar una conversación**. `claude rm` borra la sesión en
+background, que es el *proceso*, no la charla; y `/resume` solo ofrece reanudar,
+renombrar, bifurcar, buscar y filtrar. `csrm` lo suple:
+
+```sh
+csrm eco
+```
+
+Usa **el nombre que ves en `/resume`**: el que hayas puesto tú al renombrar
+(`custom-title` en el `.jsonl`) y, si no lo tiene, el que genera Claude (`ai-title`).
+Busca por substring, así que basta un trozo. Si varias coinciden, las lista y pregunta.
+
+Va al PATH (`~/.local/bin/csrm`) y no a un alias: zsh no expande alias en shells no
+interactivos, que es como se lanzan los comandos desde dentro del propio Claude.
+
+**Borra las cuatro cosas que deja una sesión**, no solo la transcripción:
+
+| | |
+|---|---|
+| `projects/<proyecto>/<uuid>.jsonl` | la conversación |
+| `projects/<proyecto>/<uuid>/` | resultados de herramientas guardados aparte |
+| `file-history/<uuid>/` | copias de los ficheros antes de cada edición |
+| `jobs/<id corto>/` | el proceso, si se lanzó en background |
+
+Ese segundo directorio es fácil de olvidar: en una sesión medida aquí pesaba **5 MB**
+frente a los 10 del `.jsonl`.
+
+Se niega a borrar la sesión en curso y las que estén vivas — para esas, `claude stop <id>`
+primero.
 
 ## legacy/
 

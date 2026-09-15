@@ -68,6 +68,40 @@ mkdir -p "$HOME/.claude"
 # El candado y su interruptor sí van enlazados: son fijos.
 link claude/full-git-guard.hooks.json "$HOME/.claude/full-git-guard.hooks.json"
 link claude/git-guard.sh         "$HOME/.claude/git-guard.sh"
+# csrm: borra conversaciones de Claude Code por nombre, que Claude Code no sabe hacer.
+# Va al PATH y no a un alias porque zsh no expande alias en shells no interactivos,
+# que es como se lanzan los comandos desde dentro del propio Claude.
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$DOTFILES/claude/claude-session-rm.py" "$HOME/.local/bin/csrm"
+echo "  $HOME/.local/bin/csrm → $DOTFILES/claude/claude-session-rm.py"
+
+# El candado de sesiones: Claude no puede borrar, renombrar ni mover ninguna sesión de
+# Claude Code, ni escribir dentro de ~/.claude salvo en memory/. A diferencia del de git
+# NO tiene interruptor: para quitarlo hay que editar settings.json a mano, y es aposta.
+link claude/session-guard.hooks.json "$HOME/.claude/session-guard.hooks.json"
+python3 - <<'CANDADO'
+import json
+from pathlib import Path
+
+destino = Path.home() / ".claude" / "settings.json"
+origen = Path.home() / ".claude" / "session-guard.hooks.json"
+if not origen.exists():
+    raise SystemExit("falta session-guard.hooks.json")
+
+s = json.loads(destino.read_text()) if destino.exists() else {}
+pre = s.setdefault("hooks", {}).setdefault("PreToolUse", [])
+for bloque in json.loads(origen.read_text())["hooks"]["PreToolUse"]:
+    m = next((x for x in pre if x.get("matcher") == bloque["matcher"]), None)
+    if m is None:
+        m = {"matcher": bloque["matcher"], "hooks": []}
+        pre.append(m)
+    for h in bloque["hooks"]:
+        if not any(h["command"][:80] in x.get("command", "") for x in m["hooks"]):
+            m["hooks"].append(h)
+
+destino.write_text(json.dumps(s, indent=2, ensure_ascii=False))
+print("  candado de sesiones: PUESTO")
+CANDADO
 # settings.json NO se enlaza, se copia si no existe. Claude Code escribe en él, y
 # quitar el candado para dejarle subir algo dejaría el repo modificado -- con el
 # riesgo de commitear un settings.json sin candado y que un Mac nuevo naciera

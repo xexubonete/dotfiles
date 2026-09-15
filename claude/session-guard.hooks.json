@@ -1,0 +1,32 @@
+{
+  "_porque": "Claude no puede tocar las sesiones de Claude Code: ni borrarlas, ni renombrarlas, ni moverlas. Borró cuatro conversaciones reales (eco, VR7, '! git st', Greeting) ejecutando csrm para 'comprobar' cosas, tres de ellas después de decir que no volvería a pasar. No existe interruptor para quitar esto, a diferencia del candado de git: se quita editando settings.json a mano, y eso es deliberado.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); printf '%s' \"$cmd\" | grep -Eq 'csrm([[:space:]]|$)|claude-session-rm|claude[[:space:]]+(rm|respawn)([[:space:]]|$)' && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"BLOQUEADO: Claude NO puede tocar sesiones de Claude Code (borrar, renombrar, mover). Ejecutalo tu. Esta regla NO tiene interruptor y no se desactiva. (deny se respeta incluso en bypassPermissions.)\"}}' || true",
+            "statusMessage": "Bloqueando borrado de sesiones…"
+          },
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // \"\"'); printf '%s' \"$cmd\" | grep -Eq '(\\.claude/(projects|jobs|file-history|sessions|session-env)|\\.claude/history\\.jsonl)' && printf '%s' \"$cmd\" | grep -Eq '(^|[[:space:];&|(`])(rm|rmdir|unlink|mv|shred|truncate|dd|tee)([[:space:]]|$)|rmtree|\\.unlink\\(|sed[[:space:]]+-i|>[[:space:]]*[^=]' && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"BLOQUEADO: eso escribe o borra dentro de ~/.claude (sesiones, jobs, historial de ficheros). Claude solo puede LEER ahi. Hazlo tu. Esta regla NO tiene interruptor.\"}}' || true",
+            "statusMessage": "Comprobando escritura en ~/.claude…"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruta=$(jq -r '.tool_input.file_path // \"\"'); printf '%s' \"$ruta\" | grep -Eq '\\.claude/(projects/[^/]+/[^/]*\\.jsonl|jobs/|file-history/|sessions/|session-env/|history\\.jsonl)' && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"BLOQUEADO: no se escribe sobre transcripciones ni estado de sesiones. (La carpeta memory/ si esta permitida.) Esta regla NO tiene interruptor.\"}}' || true",
+            "statusMessage": "Comprobando destino en ~/.claude…"
+          }
+        ]
+      }
+    ]
+  }
+}
