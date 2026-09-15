@@ -41,7 +41,12 @@ ctrl + shift - r         : komorebic retile
 # ctrl - 0                 : komorebic toggle-window-container-behaviour
 
 # Layouts
-ctrl - x                 : komorebic flip-layout horizontal
+# ctrl - x volteaba el layout en horizontal. Quitado: skhd captura las teclas a
+# nivel de sistema, así que se quedaba con el ctrl+x de TODAS las aplicaciones y
+# nunca llegaba al terminal -- en Claude Code es el atajo de borrar una sesión en
+# /resume, y en vez de borrar nada volteaba el escritorio. Cortar en un editor
+# tiene el mismo problema. El vertical se queda, que ctrl+y no lo usa nadie.
+# ctrl - x                 : komorebic flip-layout horizontal
 ctrl - y                 : komorebic flip-layout vertical
 ctrl + shift - x         : komorebic session-float-rule
 

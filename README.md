@@ -126,7 +126,7 @@ Todo en [`skhd/skhdrc`](skhd/skhdrc) (skhd lee `~/.skhdrc`). Resumen de los más
 | `ctrl + + / -` | Redimensionar en horizontal · con `shift`, en vertical |
 | `ctrl + t` | Flotante on/off · `ctrl + shift + t` ignorar flotantes en el workspace |
 | `ctrl + f` | Monocle |
-| `ctrl + x / y` | Voltear el layout en horizontal / vertical |
+| `ctrl + y` | Voltear el layout en vertical |
 | `ctrl + shift + x` | Marcar la ventana como flotante solo en esta sesión |
 | `ctrl + shift + ñ` | Alternar la capa del workspace |
 | `ctrl + shift + r` | Retile |
