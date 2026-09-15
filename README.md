@@ -48,9 +48,21 @@ no el binario de Homebrew. brew solo aporta el CLI `komorebic` en el PATH.
 **Archivos de config:**
 
 - `komorebi/komorebi.json` — config principal (layouts, paddings, `ignore_rules`, `initial_workspace_rules`, bordes). Incluye `global_work_area_offset: { top: -2, bottom: -2 }` para **pegar las ventanas a la barra de menús** (quita el hueco que deja macOS).
+  Su `$schema` apunta a **`~/dev/komorebi-for-mac/schema.json`**, el del fork, no al que publica LGUG2Z: las opciones que añade `mac-tweaks` no existen en el de upstream y el editor las marcaría como desconocidas. Si tocas la config del fork, regenera el esquema con `komorebic static-config-schema > schema.json`.
+  Opciones que **solo existen en el fork**: `border_flash_style` (`width` o `none`), `border_flash_factor`, `border_flash_duration_ms`, `border_flash_easing` y `border_radius_rules` (radio de esquina por aplicación, porque macOS no deja preguntárselo a la ventana).
 - `komorebi/applications.json` — reglas por aplicación.
 - `komorebi/komorebi.bar.json` — la barra.
 - Los atajos viven en `skhd/skhdrc` (skhd lee `~/.skhdrc`).
+
+**Foco según el puntero:** el fork lo trae, pero **no es una opción de `komorebi.json`**, se
+enciende y se apaga en caliente:
+
+```sh
+komorebic focus-follows-mouse enable    # o disable
+komorebic toggle-focus-follows-mouse
+```
+
+Ahora mismo no está asignado a ninguna tecla en `skhdrc`.
 
 **Arranque automático (LaunchAgents):**
 
@@ -83,14 +95,20 @@ Todo en [`skhd/skhdrc`](skhd/skhdrc) (skhd lee `~/.skhdrc`). Resumen de los más
 
 | Atajo | Acción |
 |-------|--------|
-| `ctrl + j / k / l / ñ` | Mover el foco izquierda / arriba / abajo / derecha |
+| `ctrl + h / j / k / l` | Mover el foco izquierda / abajo / arriba / derecha (vim) |
 | `ctrl + shift + [ ó ]` | Ciclar foco anterior / siguiente |
-| `ctrl + shift + j/k/l/ñ` | Mover la ventana en esa dirección |
+| `ctrl + shift + h/j/k/l` | Mover la ventana en esa dirección |
 | `ctrl + shift + ⏎` | Promover ventana (hacerla principal) |
-| `ctrl + 1…9` | Ir al workspace 1…9 |
-| `ctrl + shift + 1…9` | Mover la ventana al workspace 1…9 |
-| `ctrl + t` | Flotante on/off · `ctrl + f` monocle |
-| `ctrl + shift + r` | Retile · `ctrl + p` pausar komorebi |
+| `ctrl + 0…5` | Ir al workspace 0…5 (son seis) |
+| `ctrl + shift + 0…5` | Mover la ventana al workspace 0…5 |
+| `ctrl + alt + 0…5` | Mover **solo la pestaña** del navegador a ese workspace |
+| `ctrl + + / -` | Redimensionar en horizontal · con `shift`, en vertical |
+| `ctrl + t` | Flotante on/off · `ctrl + shift + t` ignorar flotantes en el workspace |
+| `ctrl + f` | Monocle |
+| `ctrl + x / y` | Voltear el layout en horizontal / vertical |
+| `ctrl + shift + x` | Marcar la ventana como flotante solo en esta sesión |
+| `ctrl + shift + ñ` | Alternar la capa del workspace |
+| `ctrl + shift + r` | Retile |
 | **`cmd + q`** | **Cierre inteligente**: cierra solo la ventana enfocada si la app tiene varias; sale de la app si es la última |
 | **`ctrl + q`** | Cierra **siempre solo** la ventana enfocada (no sale de la app) |
 | **`cmd + ctrl + ⏎`** | Nueva ventana de Ghostty |
