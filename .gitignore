@@ -15,3 +15,7 @@ legacy/sketchybar-system-stats/
 # Config local con secretos (nunca versionar)
 .zshrc.local
 *.local
+
+# Python
+__pycache__/
+*.pyc
